@@ -80,7 +80,7 @@ npos=[pos(1) pos(2)-0.05 pos(3)/2 0.05];
 S = "set(gca,'CLim',[get(gcbo,'value'), get(gcbo,'value')+100])";
 
 b = uicontrol('Parent',f,'Style','slider','Units','normalized','Position',npos,...
-              'value',cmin,'min',-350, 'max',-150,'callback',S);
+              'value',cmin,'min',-350, 'max',-150,'callback',S); % Color slider. Atm it uses fixed max and min values, instead they could be adopted to the file values.
 bgcolor = f.Color;
 bl1 = uicontrol('Parent',f,'Style','text','Units','normalized','Position',[npos(1)-0.05,npos(2),0.05,npos(4)],...
                         'String','-350','BackgroundColor',bgcolor);
@@ -138,9 +138,9 @@ plot(geoinfoidx,geoinfolayer1_ind,'b*', 'MarkerSize', 16)% this plots the overla
 
 [x,y]=ginput() %gathers points until return
 
-startsx=round(x);
+startsx=round(x(end)); % Last selected x-coordinate
 %startsx=1; %always start at position 1 - change this later - work in progress
-startsy=round(y);
+startsy=round(y(end)); %  Last selected y-coordinate
 %startsx=1; %starting position is important for success
 %startsy=518;
 layer1(1,1)=startsx;
