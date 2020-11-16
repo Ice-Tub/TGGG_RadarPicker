@@ -301,39 +301,3 @@ layer1(layer1==0)=NaN;
 %% save layer
 geoinfo.layer1=layer1;
 geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
-
-%%
-%convert radargram and picked layers to flattened scale to move them accross
-%Flatten & topo correct
-%geoinfo=FlattenFirstArrival2(geoinfo, MinBinForSurfacePick); %flatten radargram
-%geoinfo=FlattenFirstArrival_peaks(geoinfo, MinBinForSurfacePick, peakim); %flatten picked peaks - not needed if not working with flattened data...
-
-% %Figure out cross-overs
-% [xi,yi] = polyxpoly(geoinfo.psX,geoinfo.psY,geoinfo3.psX,geoinfo3.psY);
-% %check
-% figure(3)
-% plot(geoinfo.psX,geoinfo.psY,'b-o')
-% hold on
-% plot(geoinfo3.psX,geoinfo3.psY,'r-o')
-% plot(xi,yi,'g*')
-% 
-% %round to closest intercept (only use longitude?)
-% [geoinfoval,geoinfoidx]=min(abs(geoinfo.psX-xi));
-% geoinfominVal=geoinfo.psX(geoinfoidx)
-% 
-% [geoinfo3val,geoinfo3idx]=min(abs(geoinfo3.psX-xi));
-% geoinfo3minVal=geoinfo3.psX(geoinfo3idx)
-% 
-% geoinfo3layer1=geoinfo3.layer1(geoinfo3idx,2); %picked index (row below cut data) to move across to other trace
-% dt=geoinfo3.time_range(2)-geoinfo3.time_range(1);%time step (for traces)
-% 
-% geoinfo3.time_pick_abs=geoinfo3.traveltime_surface(geoinfo3idx)-geoinfo3.time_range(1);
-% geoinfo3layer1_ind=geoinfo3layer1-(geoinfo3.time_pick_abs/dt); % gives 430 - 215 (surface pick)
-% 
-% %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
-% geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfoidx)-geoinfo3.time_range(1);
-% geoinfolayer1_ind=(geoinfo.time_pick_abs/dt)+geoinfo3layer1_ind;
-% geoinfo.layer1=geoinfo.traveltime_surface*0;
-% geoinfo.layer1(1,geoinfoidx)=geoinfolayer1_ind;
-% 
-% plot(geoinfoidx,geoinfolayer1_ind,'b*', 'MarkerSize', 16)
