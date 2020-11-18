@@ -21,8 +21,8 @@ maxwavelet=16; %min is always3, layers size is half the wavelet scale
 % decide how many pixels below bed layer is counted as background noise:
 %bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
 bgSkip = 150;
-filename = append(pwd,'\TopoallData_20190107_01_006.mat');
-filename_struct = append(pwd,'\geoinfo.mat');
+filename_raw_data = append(pwd,'\TopoallData_20190107_01_006.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd,'\geoinfo.mat');
 MinBinForSurfacePick = 10;% when already preselected, this can be small
 smooth=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
@@ -35,10 +35,10 @@ clms=6200:7200; %for 6
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
 %will be overwritten by the following
 
-if isfile(filename_struct) % For programming purposes; save preprocessed file on computer to save time.
-    load(filename_struct);
+if isfile(filename_geoinfo) % For programming purposes; save preprocessed file on computer to save time.
+    load(filename_geoinfo);
 else
-    [geoinfo,echogram] = readdata2(filename,rows,clms,Bottom); % from ARESELP
+    [geoinfo,echogram] = readdata2(filename_raw_data,rows,clms,Bottom); % from ARESELP
 
     geoinfo.echogram=echogram;
 
@@ -66,7 +66,7 @@ else
 
     [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
 
-    save(filename_struct, 'geoinfo')
+    save(filename_geoinfo, 'geoinfo')
 end
 
 ind = find(geoinfo.peakim>seedthresh);
@@ -165,13 +165,20 @@ plot(geoinfoidx,geoinfolayer1_ind,'b*', 'MarkerSize', 16)% this plots the overla
 
 %% Select starting point
 % Make NaN matrix for 8 possible layers
-layers = NaN(8,nx);
-qualities = NaN(8,nx);
+if isfield(geoinfo,'layers')
+    layers = geoinfo.layers;
+    qualities = geoinfo.qualities;
+else
+    layers = NaN(8,nx);
+    qualities = NaN(8,nx);
+end
+
 picks = cell(8, 1);
 
 iteration = 1;
 while selection_active
 if iteration == 1
+    layerplot = plot(1:length(layers),layers,'b-x',1:length(layers(cl,:)),layers(cl,:),'g-x');
     disp('Move and zoom if needed. Press enter to start picking.')
     pan on;
     pause() % you can zoom with your mouse and when your image is okay, you press any key
@@ -184,18 +191,20 @@ else
 end
 [x,y,type]=ginput(); %gathers points until return
 
+if ~selection_active
+    break
+end
+
 if ~isempty(x)
     [x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
 else
     [x_in,y_in,type_in] = deal(x,y,type);
 end
+layer = layers(cl,:);
+quality = qualities(cl,:);
 if type_in == 1
     picks{cl}(end+1,:) = [x_in, y_in]; % Add new picks to pick-cell
-    
-    %% Propagate first layer
 
-    layer = layers(cl,:);
-    quality = qualities(cl,:);
     isnewlayer = all(isnan(layer), 'all'); % Check if layer is empty (True/False).
     
     [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,leftright);
@@ -233,3 +242,5 @@ geoinfo.num_layer = sum(max(~isnan(layers),[],2));
 geoinfo.layers = layers;
 geoinfo.qualities = qualities;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
+
+save(filename_geoinfo, 'geoinfo')
