@@ -60,20 +60,24 @@ else
     [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram);
     peakim = peakimcwt(imAmp,scales,wavelet,ysrf,ybtm,bgSkip); % from ARESELP
     geoinfo.peakim=peakim;
+    
+    %make logical matrix of seeds 
+    geoinfo.seeds = geoinfo.peakim>seedthresh; % 0 or 1 matrix
+
+    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
 
     save(filename_struct, 'geoinfo')
 end
 
+ind = find(geoinfo.peakim>seedthresh);
+[sy,sx]=ind2sub(size(geoinfo.peakim), ind);
 [ny nx]=size(geoinfo.echogram);
+
 
 %seedpt = selectseedpt(geoinfo.peakim); %select seedpoints according to lognormal list, not needed since later we define a threshold
 %geolayers = echogram_topo(geolayers,geoinfo,RefHeight);
 
 %%
-ind = find(geoinfo.peakim>seedthresh);
-[sy,sx]=ind2sub(size(geoinfo.peakim), ind);
-[geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-
 f = figure(2); % of flat data with seed points
 imagesc(mag2db(geoinfo.echogram));
 cini = -150;
@@ -108,23 +112,20 @@ uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpo
                 'String',append('Color range (value ',char(177),' 50)'),'BackgroundColor',bgcolor);
 
 cl = 1; % Set number of current layers
-S = "cl = get(gcbo,'value');";
+S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end";
 ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8'},'Units','normalized','Position',cpos,...
-              'value',cl,'callback',S); % Select to go left or right.
-            
+              'value',cl,'callback',S); % Choose layer.
+          
 leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
 S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go to left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
           
 selection_active = 1; % Selection active, 1 = yes, 0 = no
-S = "selection_active = get(gcbo,'value');";
+S = "selection_active = get(gcbo,'value'); return";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End Selection','Units','normalized','Position',epos,...
               'value',1,'max',0,'callback',S); % Finish selection
 
-
-%make logical matrix of seeds 
-seeds = geoinfo.peakim>seedthresh; % 0 or 1 matrix
 
 %% Figure out cross-overs (load geoinfo3 in this case)
 % need to load geoinfo3 manually 
@@ -168,70 +169,38 @@ layers = NaN(8,nx);
 qualities = NaN(8,nx);
 picks = cell(8, 1);
 
-lmid = round(window/2);
-while selection_active ==1
-disp('Move and zoom if needed. Press any button to start picking the next point.')
-pan on;
-
-pause() % you can zoom with your mouse and when your image is okay, you press any key
-pan off; % to escape the zoom mode
+iteration = 1;
+while selection_active
+if iteration == 1
+    disp('Move and zoom if needed. Press enter to start picking.')
+    pan on;
+    pause() % you can zoom with your mouse and when your image is okay, you press any key
+    pan off; % to escape the zoom mode
+    
+    disp('Pick the first point. Only the last click is saved, confirm pick with enter.')
+    iteration = iteration + 1;
+else
+	disp('Pick next point. To move or zoom, press enter.')
+end
 [x,y,type]=ginput(); %gathers points until return
-[x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
 
-
+if ~isempty(x)
+    [x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
+else
+    [x_in,y_in,type_in] = deal(x,y,type);
+end
 if type_in == 1
     picks{cl}(end+1,:) = [x_in, y_in]; % Add new picks to pick-cell
     
+    %% Propagate first layer
+
     layer = layers(cl,:);
     quality = qualities(cl,:);
     isnewlayer = all(isnan(layer), 'all'); % Check if layer is empty (True/False).
-
-    %% Propagate first layer
-
-    x_trace = x_in;
-    while ismember(x_trace, 1:nx)
-
-        if x_trace == x_in
-            disp('Pick.')
-            y_trace = y_in;
-            quality(x_trace) = 1;
-        elseif any(seeds(current_window,x_trace)) % Check if any seed is in window.
-            [lind, ~, value] = find(geoinfo.peakim(current_window,x_trace)); % Q: Does value refer to the strongest seed?
-            if length(lind)==1
-                disp('One seed - yay')
-                y_trace = current_window(lind);
-                quality(x_trace)=2;
-            else
-                disp('###closest seed')
-                wdist = abs(lind - lmid);
-                lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value. Q: Is biggest the best?
-                y_trace = current_window(lind);
-                quality(x_trace)=3;
-            end
-        else
-            [~,lind,~,p] = findpeaks(mag2db(geoinfo.echogram(current_window,x_trace))); %need to do this on the bare data.
-            if length(lind)==1
-                disp('One peak')
-                y_trace = current_window(lind);
-                quality(x_trace)=4;
-            elseif length(lind)>1
-                disp('***largest & closest peak.')     
-                wdist = 1-abs(2*(lind - lmid)/(window-1));%zwischen 0 und 1, with 1 being closer, so it will have more weight in next step
-                lprobability = wdist+p/mean(p); %not perfect, but gives a tool to weigh proximity relativ to brightness 
-                [~, indprob] = max(lprobability);
-                y_trace = current_window(lind(indprob));
-                quality(x_trace)=5;
-            else
-                disp('No peak. Use previous index for now.')
-                % y_trace does not change
-                quality(x_trace)=6;
-            end  
-        end
-        layer(x_trace) = y_trace;
-
-        current_window=ceil(y_trace-window/2):floor(y_trace+window/2);
-
-        x_trace = x_trace + leftright; %moves along the traces progressively, according to selected direction
+    
+    [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,leftright);
+    if isnewlayer
+        [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,-leftright);
     end
 elseif type_in==3
     if leftright ==1
@@ -239,49 +208,28 @@ elseif type_in==3
     else
         layer(1:x_in-1) = NaN;
     end
+elseif isempty(type_in)
+    disp('Move and zoom, to continue picking press enter.')
+    pan on;
+    pause() % you can zoom with your mouse and when your image is okay, you press any key
+    pan off; % to escape the zoom mode
+    continue
 else
     disp('Input type unknown. Only pick with left and right mouse buttons.')
 end
 
 layers(cl,:) = layer;
+qualities(cl,:) = quality;
 % Plot updated layer
 try
     delete(layerplot);
 end
-    layerplot = plot(1:length(layers),layers,'b-x')
+    layerplot = plot(1:length(layers),layers,'b-x',1:length(layers(cl,:)),layers(cl,:),'g-x');
 end
-%% make loop to perfect line with Golden Points
-% Clear Golden Points
-clear lgpx
-clear lgpy
-clear gp_layer1
-
-% Select Golden Points
-pan on;
-pause() % you can move with your mouse and when your image is okay, you press any key
-pan off; % to escape the pan mode
-[lgpx lgpy] = ginput();
-
-%%Save Golden Points
-gp_layer1(:,1) = lgpx;
-gp_layer1(:,2) = lgpy;
-
-startx=round(lgpx(1,1));
-
-%repeat = 1;
 
 
-% picked_layers(:,1)=1:1:dwidth;
-% picked_layers(:,2)=layer1(:,2);
-picked_layers=layer1(:,2);
-%% stop layer
-% select the end of the layer and the add NaNs, i.e. stop layer
-[lspx lspy button] = ginput()
-lspx=round(lspx);
-%%Save everything as NaN behind x stop point, y not important since NaN
-stoplayer=layer1(:,1)<lspx;
-layer1(:,2)=layer1(:,2).*stoplayer;
-layer1(layer1==0)=NaN;
 %% save layer
-geoinfo.layer1=layer1;
-geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
+geoinfo.num_layer = sum(max(~isnan(layers),[],2));
+geoinfo.layers = layers;
+geoinfo.qualities = qualities;
+%geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
