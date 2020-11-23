@@ -36,9 +36,9 @@ clms=2000:3000; %for 6
 %clms=4000:6000; %for 3 
 %%
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
-filename_raw_data = append(pwd,'\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd,'\pick_data\LayerData_',input_section,'.mat');
-filename_crossover = append(pwd,'\pick_data\LayerData_',cross_section,'.mat');
+filename_raw_data = append(pwd,'\..\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd,'\..\pick_data\LayerData_',input_section,'.mat');
+filename_crossover = append(pwd,'\..\pick_data\LayerData_',cross_section,'.mat');
 
 addpath(append(pwd,'\auxfunctions'))
 %will be overwritten by the following
@@ -79,7 +79,7 @@ end
 
 ind = find(geoinfo.peakim>seedthresh);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
-[ny nx]=size(geoinfo.echogram);
+[ny,nx]=size(geoinfo.echogram);
 
 
 %seedpt = selectseedpt(geoinfo.peakim); %select seedpoints according to lognormal list, not needed since later we define a threshold
