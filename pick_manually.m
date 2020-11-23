@@ -23,8 +23,9 @@ maxwavelet=16; %min is always3, layers size is half the wavelet scale
 bgSkip = 150;
 input_section = '003';
 cross_section = '006';
-load_crossover = 0; % 1 = yes, 0 = no
-create_new_geoinfo = 0; % 1 = yes, 0 = no
+load_crossover = 1;     % 1 = yes, 0 = no
+create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
+keep_old_picks = 1;     % 1 = yes, 0 = no.
 MinBinForSurfacePick = 10;% when already preselected, this can be small
 smooth=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
@@ -32,8 +33,8 @@ MinBinForBottomPick = 1500;
 smooth2=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-clms=2000:3000; %for 6 
-%clms=4000:6000; %for 3 
+%clms=6000:8000; %for 6 
+clms=4000:6000; %for 3 
 %%
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
 filename_raw_data = append(pwd,'\..\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
@@ -55,31 +56,40 @@ else
     geoinfo = pick_surface(geoinfo,echogram,MinBinForSurfacePick,smooth);
     geoinfo = pick_bottom(geoinfo,echogram,MinBinForBottomPick,smooth2);
 
-    %make graphic to check main reflectors
-    figure(1)
-    plotmainpicks(geoinfo,clms)
-
     %wavelet part
     minscales=3;
     scales = minscales:maxwavelet; % definition from ARESELP
-    DIST = (maxwavelet/2); 
+    %DIST = (maxwavelet/2); 
 
     %calculate seedpoints
-    [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram);
+    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram);
     peakim = peakimcwt(imAmp,scales,wavelet,ysrf,ybtm,bgSkip); % from ARESELP
     geoinfo.peakim=peakim;
+    clear peakim imAmp ysrf ybtm echogram scales
     
     %make logical matrix of seeds 
     geoinfo.seeds = geoinfo.peakim>seedthresh; % 0 or 1 matrix
 
     [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
 
+    if keep_old_picks
+        geoinfo_old = load(filename_geoinfo);
+        geoinfo.num_layer = geoinfo_old.num_layer;
+        geoinfo.layers = geoinfo_old.layers;
+        geoinfo.qualities = geoinfo_old.qualities;
+        clear geoinfo_old
+    end
+    
     save(filename_geoinfo, '-struct', 'geoinfo')
 end
 
+%make graphic to check main reflectors
+figure(1)
+plotmainpicks(geoinfo,clms)
+    
 ind = find(geoinfo.peakim>seedthresh);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
-[ny,nx]=size(geoinfo.echogram);
+[~,nx]=size(geoinfo.echogram);
 
 
 %seedpt = selectseedpt(geoinfo.peakim); %select seedpoints according to lognormal list, not needed since later we define a threshold
@@ -131,14 +141,14 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
-S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; save(filename_geoinfo, '-struct', 'geoinfo')";
+S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
-          
-selection_active = 1; % Selection active, 1 = yes, 0 = no
-S = "selection_active = get(gcbo,'value'); return";
+ 
+robot = java.awt.Robot;
+S = "set(ui_f, 'UserData', 0);"; % robot.keyPress (java.awt.event.KeyEvent.VK_ENTER); robot.keyRelease  (java.awt.event.KeyEvent.VK_ENTER);";
 ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
-              'value',1,'max',0,'callback',S); % Finish selection
+              'Callback',S,'UserData', 1); % Finish selection
 
 
 %% Figure out cross-overs (load geoinfo3 in this case)
@@ -176,7 +186,7 @@ if load_crossover
     geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
     geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
 
-    co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'b*', geoinfo_idx, geoinfo_layers_ind(cl),'g*', 'MarkerSize', 16);% this plots the overlapping point in this graph
+    co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 %% Select starting point
 % Make NaN matrix for 8 possible layers
@@ -191,22 +201,26 @@ end
 picks = cell(8, 1);
 
 iteration = 1;
-while selection_active
+
+while get(ui_f, 'UserData')
 if iteration == 1
-    layerplot = plot(1:length(layers),layers,'b-x',1:length(layers(cl,:)),layers(cl,:),'g-x');
+    layerplot = plot(1:length(layers),layers,'k-x',1:length(layers(cl,:)),layers(cl,:),'b-x');
     disp('Move and zoom if needed. Press enter to start picking.')
     pan on;
-    pause() % you can zoom with your mouse and when your image is okay, you press any key
+    pause(); % you can zoom with your mouse and when your image is okay, you press any key
     pan off; % to escape the zoom mode
-    
+    if ~get(ui_f, 'UserData')
+        break
+    end
     disp('Pick the first point. Only the last click is saved, confirm pick with enter.')
     iteration = iteration + 1;
 else
 	disp('Pick next point. To move or zoom, press enter.')
 end
+
 [x,y,type]=ginput(); %gathers points until return
 
-if ~selection_active
+if ~get(ui_f, 'UserData')
     break
 end
 
@@ -237,7 +251,9 @@ elseif isempty(type_in)
     pan on;
     pause() % you can zoom with your mouse and when your image is okay, you press any key
     pan off; % to escape the zoom mode
-    continue
+    if ~get(ui_f, 'UserData')
+        break
+    end
 else
     disp('Input type unknown. Only pick with left and right mouse buttons.')
 end
@@ -248,9 +264,9 @@ qualities(cl,:) = quality;
 try
     delete(layerplot);
 end
-    layerplot = plot(1:length(layers),layers,'b-x',1:length(layers(cl,:)),layers(cl,:),'g-x');
+    layerplot = plot(1:length(layers),layers,'k-x',1:length(layers(cl,:)),layers(cl,:),'b-x');
 end
-
+disp('Picking finished. Picked layers are saved.')
 
 %% save layer
 geoinfo.num_layer = sum(max(~isnan(layers),[],2));
