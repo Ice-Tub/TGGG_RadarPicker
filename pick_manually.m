@@ -22,8 +22,9 @@ maxwavelet=16; %min is always3, layers size is half the wavelet scale
 %bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
 bgSkip = 150;
 input_section = '006';
-load_crossover = 1; % 1 = yes, 0 = no
 cross_section = '003';
+load_crossover = 1; % 1 = yes, 0 = no
+create_new_geoinfo = 0; % 1 = yes, 0 = no
 MinBinForSurfacePick = 10;% when already preselected, this can be small
 smooth=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
@@ -35,12 +36,13 @@ clms=6000:8000; %for 6
 %clms=4000:6000; %for 3 
 %%
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
-filename_raw_data = append(pwd,'\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd,'\LayerData_',input_section,'.mat');
-filename_crossover = append(pwd,'\LayerData_',cross_section,'.mat');
+filename_raw_data = append(pwd,'\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd,'\pick_data\LayerData_',input_section,'.mat');
+filename_crossover = append(pwd,'\pick_data\LayerData_',cross_section,'.mat');
+
+addpath(append(pwd,'\auxfunctions'))
 %will be overwritten by the following
 
-create_new_geoinfo = 0; % 1 = yes, 0 = no
 if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; save preprocessed file on computer to save time.
     geoinfo = load(filename_geoinfo);
 else
@@ -97,9 +99,11 @@ set(a,'CLim',[cini-50 cini+50]); % Initial color range
 apos=get(a,'position');
 set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
 bpos=[apos(1) apos(2)-0.05 apos(3)/3 0.05];
-cpos=[apos(3)/3+0.15 apos(2)-0.05 0.15 0.05];
-dpos=[apos(3)/3+0.32 apos(2)-0.05 0.15 0.05];
-epos=[apos(3)/3+0.49 apos(2)-0.05 0.15 0.05];
+cpos=[apos(3)/3+0.15 apos(2)-0.05 0.12 0.05];
+dpos=[apos(3)/3+0.28 apos(2)-0.05 0.12 0.05];
+epos=[apos(3)/3+0.41 apos(2)-0.05 0.12 0.05];
+fpos=[apos(3)/3+0.54 apos(2)-0.05 0.12 0.05];
+
 
 
 cmin = round(min(mag2db(geoinfo.echogram),[],'all')+50); 
@@ -124,12 +128,16 @@ ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2',
           
 leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
 S = "leftright = get(gcbo,'value');";
-ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go to left','Units','normalized','Position',dpos,...
+ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
+
+S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; save(filename_geoinfo, '-struct', 'geoinfo')";
+ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
+              'callback',S); % Finish selection
           
 selection_active = 1; % Selection active, 1 = yes, 0 = no
-S = "selection_active = get(gcbo,'value'); return";
-ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End Selection','Units','normalized','Position',epos,...
+S = "selection_active = get(gcbo,'value'); continue";
+ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
               'value',1,'max',0,'callback',S); % Finish selection
 
 
@@ -168,7 +176,7 @@ if load_crossover
     geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
     geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
 
-    co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'b*', geoinfo_idx, geoinfo_layers_ind(cl),'g*', 'MarkerSize', 16)% this plots the overlapping point in this graph
+    co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'b*', geoinfo_idx, geoinfo_layers_ind(cl),'g*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 %% Select starting point
 % Make NaN matrix for 8 possible layers
@@ -225,7 +233,7 @@ elseif type_in==3
         layer(1:x_in-1) = NaN;
     end
 elseif isempty(type_in)
-    disp('Move and zoom, to continue picking press enter.')
+    disp('Move and zoom. To continue picking, press enter.')
     pan on;
     pause() % you can zoom with your mouse and when your image is okay, you press any key
     pan off; % to escape the zoom mode
@@ -249,5 +257,4 @@ geoinfo.num_layer = sum(max(~isnan(layers),[],2));
 geoinfo.layers = layers;
 geoinfo.qualities = qualities;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
-
 save(filename_geoinfo, '-struct', 'geoinfo')
