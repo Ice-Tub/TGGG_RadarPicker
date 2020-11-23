@@ -136,7 +136,7 @@ ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units'
               'callback',S); % Finish selection
           
 selection_active = 1; % Selection active, 1 = yes, 0 = no
-S = "selection_active = get(gcbo,'value'); continue";
+S = "selection_active = get(gcbo,'value'); return";
 ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
               'value',1,'max',0,'callback',S); % Finish selection
 
