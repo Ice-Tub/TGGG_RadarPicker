@@ -27,11 +27,11 @@ cross_section = '003';
 MinBinForSurfacePick = 10;% when already preselected, this can be small
 smooth=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
-MinBinForBottomPick = 1800; 
+MinBinForBottomPick = 1500; 
 smooth2=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-clms=6000:8000; %for 6 
+clms=1:8000; %for 6 
 %clms=4000:6000; %for 3 
 %%
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
