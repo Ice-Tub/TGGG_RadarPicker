@@ -21,8 +21,10 @@ maxwavelet=16; %min is always3, layers size is half the wavelet scale
 % decide how many pixels below bed layer is counted as background noise:
 %bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
 bgSkip = 150;
-filename_raw_data = append(pwd,'\TopoallData_20190107_01_006.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd,'\geoinfo.mat');
+filename_raw_data = append(pwd,'\TopoallData_20190107_01_003.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd,'\LayerData_003.mat');
+load_crossover = 0; % 1 = yes, 0 = no
+filename_crossover = append(pwd,'\TopoallData_20190107_01_006.mat');
 MinBinForSurfacePick = 10;% when already preselected, this can be small
 smooth=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
@@ -30,7 +32,7 @@ MinBinForBottomPick = 1800;
 smooth2=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-clms=6200:7200; %for 6 
+clms=1:8268; %for 6 
 %%
 Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
 %will be overwritten by the following
@@ -130,39 +132,42 @@ ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End Selection','Uni
 %% Figure out cross-overs (load geoinfo3 in this case)
 % need to load geoinfo3 manually 
 
-load('geoinfo_3.mat') % added by Falk
-%[geoinfo3.psX,geoinfo3.psY] = ll2ps(geoinfo3.latitude,geoinfo3.longitude); %convert to polar stereographic
+if load_crossover
+    geoinfo3 = load(filename_crossover); % added by Falk
+    if ~isfield(geoinfo3,'psX') % Check if polar stereographic coordinates not exist in file
+        [geoinfo3.psX,geoinfo3.psY] = ll2ps(geoinfo3.latitude,geoinfo3.longitude); %convert to polar stereographic
+    end
 
-[xi,yi] = polyxpoly(geoinfo.psX,geoinfo.psY,geoinfo3.psX,geoinfo3.psY); %selecting the polar stereographic 
-%coordinates of overlapping profiles
-%check
-%figure(3)
-%plot(geoinfo.psX,geoinfo.psY,'b-o')
-%hold on
-%plot(geoinfo3.psX,geoinfo3.psY,'r-o')
-%plot(xi,yi,'g*')
+    [xi,yi] = polyxpoly(geoinfo.psX,geoinfo.psY,geoinfo3.psX,geoinfo3.psY); %selecting the polar stereographic 
+    %coordinates of overlapping profiles
+    %check
+    %figure(3)
+    %plot(geoinfo.psX,geoinfo.psY,'b-o')
+    %hold on
+    %plot(geoinfo3.psX,geoinfo3.psY,'r-o')
+    %plot(xi,yi,'g*')
 
-%round to closest intercept (only use longitude?)
-[geoinfoval,geoinfoidx]=min(abs(geoinfo.psX-xi));
-geoinfominVal=geoinfo.psX(geoinfoidx);
+    %round to closest intercept (only use longitude?)
+    [geoinfoval,geoinfoidx]=min(abs(geoinfo.psX-xi));
+    geoinfominVal=geoinfo.psX(geoinfoidx);
 
-[geoinfo3val,geoinfo3idx]=min(abs(geoinfo3.psX-xi));
-geoinfo3minVal=geoinfo3.psX(geoinfo3idx);
+    [geoinfo3val,geoinfo3idx]=min(abs(geoinfo3.psX-xi));
+    geoinfo3minVal=geoinfo3.psX(geoinfo3idx);
 
-geoinfo3layer1=geoinfo3.layer1(geoinfo3idx,2); %picked index (row below cut data) to move across to other trace
-dt=geoinfo3.time_range(2)-geoinfo3.time_range(1);%time step (for traces)
+    geoinfo3layer1=geoinfo3.layer1(geoinfo3idx,2); %picked index (row below cut data) to move across to other trace
+    dt=geoinfo3.time_range(2)-geoinfo3.time_range(1);%time step (for traces)
 
-geoinfo3.time_pick_abs=geoinfo3.traveltime_surface(geoinfo3idx)-geoinfo3.time_range(1);
-geoinfo3layer1_ind=geoinfo3layer1-(geoinfo3.time_pick_abs/dt); % gives 430 - 215 (surface pick)
+    geoinfo3.time_pick_abs=geoinfo3.traveltime_surface(geoinfo3idx)-geoinfo3.time_range(1);
+    geoinfo3layer1_ind=geoinfo3layer1-(geoinfo3.time_pick_abs/dt); % gives 430 - 215 (surface pick)
 
-%geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
-geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfoidx)-geoinfo3.time_range(1);
-geoinfolayer1_ind=(geoinfo.time_pick_abs/dt)+geoinfo3layer1_ind;
-geoinfo.layer1=geoinfo.traveltime_surface*0;
-geoinfo.layer1(1,geoinfoidx)=geoinfolayer1_ind;
+    %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
+    geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfoidx)-geoinfo3.time_range(1);
+    geoinfolayer1_ind=(geoinfo.time_pick_abs/dt)+geoinfo3layer1_ind;
+    geoinfo.layer1=geoinfo.traveltime_surface*0;
+    geoinfo.layer1(1,geoinfoidx)=geoinfolayer1_ind;
 
-plot(geoinfoidx,geoinfolayer1_ind,'b*', 'MarkerSize', 16)% this plots the overlapping point in this graph
-
+    plot(geoinfoidx,geoinfolayer1_ind,'b*', 'MarkerSize', 16)% this plots the overlapping point in this graph
+end
 %% Select starting point
 % Make NaN matrix for 8 possible layers
 if isfield(geoinfo,'layers')
