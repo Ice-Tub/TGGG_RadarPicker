@@ -1,5 +1,4 @@
 # picking_isochrones
-optimizing code for picking airborne radar data
 
 To pick layers in airborne radar data you need to run 'pick_manually.m'.
 
