@@ -17,11 +17,13 @@ load_crossover: If another outputfile with picked layers already exists, you can
 
 Figure 2:
 
-You can pick in figure 2, by clicking and pressing enter. With the first left-click, a layer is traced to both directions starting from the click-position.
+You can pick in figure 2. Therefore, 3 input-types are used: left-click, right-click and enter. With clicking, the layers can be changed. Each click needs to be confirmed by pressing enter. Additionally, you can switch between picking mode and move-/zoom-mode, by pushing enter (If no click was made). 
+
+With the first left-click, a layer is traced to both directions starting from the click-position.
 
 Afterwards you can left-click to force the layer to a specific point and trace it from there onwards.
 
-With a right-click you can delete all points in the layer on the right side of the click position. If you want a gap in the layer, use this to cut it of and then left-click where you want to start again.
+With a right-click you can delete all points in the layer on the right side of the click position. To creat a gap in the layer, you can use this to cut it off and start it over again with another left-click.
 
 If the option 'Go left' is activated, you can do the same as above, just in the other direction.
 
