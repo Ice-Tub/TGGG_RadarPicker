@@ -13,7 +13,7 @@ create_new_geoinfo: If a file with the stated output-name (filename_geoinfo) alr
 
 keep_old_picks: If a new output-file is created, while a old file exists, picks of the old file can be transferred with this option. Note: Until now, this does not correct the position of the picks, if the limits of the radargram are changed.
 
-load_crossover = 1; If another outputfile with picked layers already exists, you can activate this option to find cross-points.
+load_crossover: If another outputfile with picked layers already exists, you can activate this option to find cross-points.
 
 Figure 2:
 
