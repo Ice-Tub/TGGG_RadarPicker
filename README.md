@@ -7,9 +7,9 @@ Data:
 The raw_data needs to be placed in a folder called 'raw_data', placed in the same directory as picking_isochrones.
 Here, a folder 'pick_data' will also be created by the programm, where the radar_data in connection with the picked layers is saved.
 
-Options:
-create_new_geoinfo: If a file with the stated output-name (filename_geoinfo) already exists, this option can be activated to force the creation of a new output-file.
-keep_old_picks: If a new output-file is created, while a old file exists, picks of the old file can be transferred with this option. Note: Until now, this does not correct the position of the picks, if the limits of the radargram are changed.
+Options:\newline
+create_new_geoinfo: If a file with the stated output-name (filename_geoinfo) already exists, this option can be activated to force the creation of a new output-file.\newline
+keep_old_picks: If a new output-file is created, while a old file exists, picks of the old file can be transferred with this option. Note: Until now, this does not correct the position of the picks, if the limits of the radargram are changed.\newline
 load_crossover = 1; If another outputfile with picked layers already exists, you can activate this option to find cross-points.
 
 Figure 2:
