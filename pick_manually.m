@@ -8,103 +8,53 @@
 
 clear all; 
 close all;
+addpath(append(pwd,'\auxfunctions'))
+
+% Settings
+input_section = '003'; % Current section to pick new layers.
+cross_section = '006'; % Some already pick section to find cross-points.
+create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
+keep_old_picks = 1;     % 1 = yes, 0 = no
+load_crossover = 1;     % 1 = yes, 0 = no
+len_color_range = 140;
 
 %TUNING PARAMETERS
-window=9; %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
-seedthresh=5;% 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
-window2=20; %20 slope seems to work, window over which the linear propagation works
+tp.window=9; %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
+tp.seedthresh=5;% 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
 %wavelet parameters
-wavelet = 'mexh';% choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results 
-%wavelet = 'morl';
-% define the wavelet scales:
-maxwavelet=16; %min is always3, layers size is half the wavelet scale
+tp.wavelet = 'mexh';% choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results 
+tp.maxwavelet=16; %min is always 3, layers size is half the wavelet scale
 % decide how many pixels below bed layer is counted as background noise:
-%bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
-bgSkip = 150;
-input_section = '003';
-cross_section = '006';
-load_crossover = 1;     % 1 = yes, 0 = no
-create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
-keep_old_picks = 1;     % 1 = yes, 0 = no.
-MinBinForSurfacePick = 10;% when already preselected, this can be small
-smooth=40; %between 30 and 60 seems to be good
+tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
+tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
+tp.smooth_sur=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
-MinBinForBottomPick = 1500; 
-smooth2=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
-RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
-rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
+tp.MinBinForBottomPick = 1500; 
+tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
+tp.RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
+tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
 %clms=6000:8000; %for 6 
-clms=4000:6000; %for 3 
-%%
-Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line 
+tp.clms=4000:6000; %for 3 
+%
 filename_raw_data = append(pwd,'\..\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
 filename_geoinfo = append(pwd,'\..\pick_data\LayerData_',input_section,'.mat');
 filename_crossover = append(pwd,'\..\pick_data\LayerData_',cross_section,'.mat');
 
-addpath(append(pwd,'\auxfunctions'))
-%will be overwritten by the following
+geoinfo = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
 
-if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; save preprocessed file on computer to save time.
-    geoinfo = load(filename_geoinfo);
-else
-    [geoinfo,echogram] = readdata2(filename_raw_data,rows,clms,Bottom); % from ARESELP
-
-    geoinfo.echogram=echogram;
-
-    %pick main reflectors (the bottom pick is very important for background
-    %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
-    geoinfo = pick_surface(geoinfo,echogram,MinBinForSurfacePick,smooth);
-    geoinfo = pick_bottom(geoinfo,echogram,MinBinForBottomPick,smooth2);
-
-    %wavelet part
-    minscales=3;
-    scales = minscales:maxwavelet; % definition from ARESELP
-    %DIST = (maxwavelet/2); 
-
-    %calculate seedpoints
-    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram);
-    peakim = peakimcwt(imAmp,scales,wavelet,ysrf,ybtm,bgSkip); % from ARESELP
-    geoinfo.peakim=peakim;
-    clear peakim imAmp ysrf ybtm echogram scales
-    
-    %make logical matrix of seeds 
-    geoinfo.seeds = geoinfo.peakim>seedthresh; % 0 or 1 matrix
-
-    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-
-    if keep_old_picks
-        geoinfo_old = load(filename_geoinfo);
-        geoinfo.num_layer = geoinfo_old.num_layer;
-        geoinfo.layers = geoinfo_old.layers;
-        geoinfo.qualities = geoinfo_old.qualities;
-        clear geoinfo_old
-    end
-    
-    save(filename_geoinfo, '-struct', 'geoinfo')
-end
-
-%make graphic to check main reflectors
-figure(1)
-plotmainpicks(geoinfo,clms)
-    
-ind = find(geoinfo.peakim>seedthresh);
+ind = find(geoinfo.peakim);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
-[~,nx]=size(geoinfo.echogram);
-
-
-%seedpt = selectseedpt(geoinfo.peakim); %select seedpoints according to lognormal list, not needed since later we define a threshold
-%geolayers = echogram_topo(geolayers,geoinfo,RefHeight);
+nx = size(geoinfo.echogram,2);
 
 %%
 f = figure(2); % of flat data with seed points
 imagesc(mag2db(geoinfo.echogram));
-cini = -150;
 colormap(jet)
 hold on
 plot(sx,sy,'r*') % plot seedpoints
 set(gcf,'doublebuffer','on');
 a = gca;
-set(a,'CLim',[cini-50 cini+50]); % Initial color range
+cr_half = len_color_range/2;
 
 apos=get(a,'position');
 set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
@@ -116,11 +66,13 @@ fpos=[apos(3)/3+0.54 apos(2)-0.05 0.12 0.05];
 
 
 
-cmin = round(min(mag2db(geoinfo.echogram),[],'all')+50); 
-cmax = round(max(mag2db(geoinfo.echogram),[],'all')-50);
+cmin = round(min(mag2db(geoinfo.echogram),[],'all')+cr_half); 
+cmax = round(max(mag2db(geoinfo.echogram),[],'all')-cr_half);
+cini = min(cmax,-150);
+set(a,'CLim',[cini-cr_half cini+cr_half]); % Initial color range
 
 % Create color slider
-S = "set(gca,'CLim',[get(gcbo,'value')-50, get(gcbo,'value')+50])";
+S = "set(gca,'CLim',[get(gcbo,'value')-cr_half, get(gcbo,'value')+cr_half])";
 ui_b = uicontrol('Parent',f,'Style','slider','Units','normalized','Position',bpos,...
               'value',cini,'min',cmin,'max',cmax,'callback',S); % Color slider. Atm it uses fixed max and min values, instead they could be adopted to the file values.
 bgcolor = f.Color;
@@ -129,7 +81,7 @@ uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)-0.0
 uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)-0.05,bpos(2),0.05,bpos(4)],...
                 'String',num2str(cmax),'BackgroundColor',bgcolor);
 uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)/2-0.15,bpos(2)-0.05,0.3,0.05],...
-                'String',append('Color range (value ',char(177),' 50)'),'BackgroundColor',bgcolor);
+                'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
 cl = 1; % Set number of current layers
 S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',geoinfo_layers_ind(cl)); end";
@@ -141,12 +93,11 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
-S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
+S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
  
-robot = java.awt.Robot;
-S = "set(ui_f, 'UserData', 0);"; % robot.keyPress (java.awt.event.KeyEvent.VK_ENTER); robot.keyRelease  (java.awt.event.KeyEvent.VK_ENTER);";
+S = "set(ui_f, 'UserData', 0);";
 ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
               'Callback',S,'UserData', 1); % Finish selection
 
@@ -236,9 +187,9 @@ if type_in == 1
 
     isnewlayer = all(isnan(layer), 'all'); % Check if layer is empty (True/False).
     
-    [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,leftright);
+    [layer,quality] = propagate_layer(layer,quality,geoinfo,tp.window,x_in,y_in,leftright);
     if isnewlayer
-        [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,-leftright);
+        [layer,quality] = propagate_layer(layer,quality,geoinfo,tp.window,x_in,y_in,-leftright);
     end
 elseif type_in==3
     if leftright ==1
@@ -272,5 +223,6 @@ disp('Picking finished. Picked layers are saved.')
 geoinfo.num_layer = sum(max(~isnan(layers),[],2));
 geoinfo.layers = layers;
 geoinfo.qualities = qualities;
+geoinfo.tp = tp;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
 save(filename_geoinfo, '-struct', 'geoinfo')

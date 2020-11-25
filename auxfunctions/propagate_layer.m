@@ -5,15 +5,14 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_i
 
     x_trace = x_in;
     
-    [~, nx]=size(geoinfo.echogram);
+    nx = size(geoinfo.echogram, 2);
     while ismember(x_trace, 1:nx)
-
         if x_trace == x_in
             %disp('Pick.')
             y_trace = y_in;
             quality(x_trace) = 1;
-        elseif any(geoinfo.seeds(current_window,x_trace)) % Check if any seed is in window.
-            [lind, ~, value] = find(geoinfo.peakim(current_window,x_trace)); % Q: Does value refer to the strongest seed?
+        elseif any(geoinfo.peakim(current_window,x_trace)) % Check if any seed is in window.
+            [lind, ~, value] = find(geoinfo.peakim(current_window,x_trace));
             if length(lind)==1
                 %disp('One seed - yay')
                 y_trace = current_window(lind);
@@ -21,7 +20,7 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_i
             else
                 %disp('###closest seed')
                 wdist = abs(lind - lmid);
-                lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value. Q: Is biggest the best?
+                lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value.
                 y_trace = current_window(lind);
                 quality(x_trace)=3;
             end

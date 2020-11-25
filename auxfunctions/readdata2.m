@@ -1,4 +1,4 @@
-function [geoinfo,echogram] = readdata(filename, rows, clms, Bottom)
+function [geoinfo,echogram] = readdata(filename, rows, clms)
 %--------------------------------------------------------------
 % Read geoinfo and other Meta info from MATFILE
 %
@@ -23,6 +23,7 @@ function [geoinfo,echogram] = readdata(filename, rows, clms, Bottom)
 % --------
 % [geoinfo, echogram] = read_data('Data_20110329_02_019.mat');
 %---------------------------------------------------------------
+    Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line (was implemented as a function argument before)
     
     C = 3e8; EPSILON = 3.15;
     % extract geoinformation and other Meta data from datasets
