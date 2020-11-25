@@ -35,7 +35,7 @@ tp.RefHeight=500; %set the maximum height for topo correction of echogram, exten
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
 %clms=6000:8000; %for 6 
 tp.clms=4000:6000; %for 3 
-%
+%%
 filename_raw_data = append(pwd,'\..\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
 filename_geoinfo = append(pwd,'\..\pick_data\LayerData_',input_section,'.mat');
 filename_crossover = append(pwd,'\..\pick_data\LayerData_',cross_section,'.mat');
@@ -93,7 +93,7 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
-S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
+S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
  
@@ -139,6 +139,9 @@ if load_crossover
 
     co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
+
+time_surface = geoinfo.traveltime_surface-geoinfo_co.time_range(1);
+surface_ind = time_surface/dt;
 %% Select starting point
 % Make NaN matrix for 8 possible layers
 if isfield(geoinfo,'layers')
@@ -211,6 +214,7 @@ end
 
 layers(cl,:) = layer;
 qualities(cl,:) = quality;
+layers_relto_surface = layers - surface_ind;
 % Plot updated layer
 try
     delete(layerplot);
@@ -219,9 +223,11 @@ end
 end
 disp('Picking finished. Picked layers are saved.')
 
+
 %% save layer
 geoinfo.num_layer = sum(max(~isnan(layers),[],2));
 geoinfo.layers = layers;
+geoinfo.layers_relto_surface = layers_relto_surface;
 geoinfo.qualities = qualities;
 geoinfo.tp = tp;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
