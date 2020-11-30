@@ -11,8 +11,12 @@ close all;
 addpath(append(pwd,'\auxfunctions'))
 
 % Settings
-input_section = '003'; % Current section to pick new layers.
-cross_section = '006'; % Some already pick section to find cross-points.
+input_section = '009'; % Current section to pick new layers.
+cross_section = 'all'; % {'009'; '006'};  % Options : List of numbers (e.g.:{'009'; '006'}) or all files in data_folder('all'). Some already pick section to find cross-points.
+raw_folder = '\raw_data';
+raw_prefix = '\TopoallData_20190107_01_';
+output_folder = '\pick_data';
+output_prefix = '\LayerData_';
 create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 keep_old_picks = 1;     % 1 = yes, 0 = no
 load_crossover = 1;     % 1 = yes, 0 = no
@@ -33,12 +37,27 @@ tp.MinBinForBottomPick = 1500;
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-%clms=6000:8000; %for 6 
-tp.clms=4000:6000; %for 3 
+tp.clms=1:5000;
 %%
-filename_raw_data = append(pwd,'\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd,'\pick_data\LayerData_',input_section,'.mat');
-filename_crossover = append(pwd,'\pick_data\LayerData_',cross_section,'.mat');
+filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');
+filenames_cross = {};
+if strcmp(cross_section,'all')
+    cross_struct = dir(append(pwd,output_folder,'\*.mat'));
+    n_cross = length(cross_struct);
+    for k = 1:n_cross
+        filename_cross = append(cross_struct(k).folder, '\', cross_struct(k).name);
+        filenames_cross = [filenames_cross; filename_cross];
+    end
+else
+    n_cross = numel(cross_section);
+    for k = 1:n_cross
+        filename_cross = append(pwd,output_folder,output_prefix,cross_section{k},'.mat');
+        filenames_cross = [filenames_cross; filename_cross];
+    end
+end
+filenames_cross = setdiff(filenames_cross, {filename_geoinfo});
+n_cross = length(filenames_cross);
 
 geoinfo = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
 
@@ -90,7 +109,7 @@ uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpo
                 'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
 cl = 1; % Set number of current layers
-S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',cross_point_layers(cl)); end";
+S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',cross_point_layers(cl,:)); end";
 ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8'},'Units','normalized','Position',cpos,...
               'value',cl,'callback',S); % Choose layer.
           
@@ -114,55 +133,56 @@ ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units
 cross_point_idx = NaN;
 cross_point_layers = NaN(8,1);
 if load_crossover
-    
-    geoinfo_co = load(filename_crossover); % Loading the cross-over file
-    if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
-        [geoinfo_co.psX,geoinfo_co.psY] = ll2ps(geoinfo_co.latitude,geoinfo_co.longitude); %convert to polar stereographic
-    end
-    
-    P = [geoinfo.psX; geoinfo.psY]';
-    P_co= [geoinfo_co.psX; geoinfo_co.psY]';
-    [k,dist] = dsearchn(P,P_co);
-    
-    [val_dist, pos_dist] = min(dist);
-    
-    distthresh  = 10;  % Minimal allowed distance between cross- or neighbour-points.
-    if val_dist < 10
-        geoinfo_co_idx = pos_dist;
-        geoinfo_idx = k(pos_dist);
-    end
-    
-    if exist('geoinfo_co_idx', 'var')
-        %figure(3)
-        %plot(P(:,1),P(:,2),'ko')
-        %hold on
-        %plot(P_co(:,1),P_co(:,2),'*g')
-        %hold on
-        %plot(P(geoinfo_idx,1),P(geoinfo_idx,2),'*r')
-        %figure(2)
+    for k = 1:n_cross
+        geoinfo_co = load(filenames_cross{k}); % Loading the cross-over file
+        if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
+            [geoinfo_co.psX,geoinfo_co.psY] = ll2ps(geoinfo_co.latitude,geoinfo_co.longitude); %convert to polar stereographic
+        end
 
-        geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
-        dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
+        P = [geoinfo.psX; geoinfo.psY]';
+        P_co= [geoinfo_co.psX; geoinfo_co.psY]';
+        [points_dist,dist] = dsearchn(P,P_co);
 
-        geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
-        geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
+        [val_dist, pos_dist] = min(dist);
 
-        %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
-        geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
-        geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
-        
-        if any(cross_point_layers)
-            cross_point_idx = [cross_point_idx, geoinfo_idx];
-            cross_point_layers = [cross_point_layers, geoinfo_layers_ind];
-        else
-            cross_point_idx = geoinfo_idx;
-            cross_point_layers = geoinfo_layers_ind;
-        end 
-        clear geoinfo_co_layers_ind geoinfo_layers_ind
+        distthresh  = 10;  % Minimal allowed distance between cross- or neighbour-points.
+        if val_dist < 10
+            geoinfo_co_idx = pos_dist;
+            geoinfo_idx = points_dist(pos_dist);
+        end
+
+        if exist('geoinfo_co_idx', 'var')
+            %figure(3)
+            %plot(P(:,1),P(:,2),'ko')
+            %hold on
+            %plot(P_co(:,1),P_co(:,2),'*g')
+            %hold on
+            %plot(P(geoinfo_idx,1),P(geoinfo_idx,2),'*r')
+            %figure(2)
+            if exist('geoinfo_co_idx', 'var')
+                geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
+                dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
+
+                geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
+                geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
+
+                %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
+                geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
+                geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
+            end
+            if any(cross_point_layers)
+                cross_point_idx = [cross_point_idx, geoinfo_idx];
+                cross_point_layers = [cross_point_layers, geoinfo_layers_ind];
+            elseif exist('geoinfo_layers_ind', 'var')
+                cross_point_idx = geoinfo_idx;
+                cross_point_layers = geoinfo_layers_ind;
+            end 
+            clear geoinfo_co_layers_ind geoinfo_layers_ind geoinfo_co_idx geoinfo_idx
+        end
     end
 end
 
-co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
+co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl,:),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 
 %% Select starting point
 % Make NaN matrix for 8 possible layers
