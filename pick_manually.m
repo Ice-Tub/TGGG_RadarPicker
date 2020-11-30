@@ -111,9 +111,9 @@ ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units
 %% Figure out cross-overs (load geoinfo3 in this case)
 % need to load geoinfo3 manually 
 
+cross_point_idx = NaN;
+cross_point_layers = NaN(8,1);
 if load_crossover
-    cross_point_idx = NaN;
-    cross_point_layers = NaN(8,1);
     
     geoinfo_co = load(filename_crossover); % Loading the cross-over file
     if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
@@ -160,9 +160,9 @@ if load_crossover
         end 
         clear geoinfo_co_layers_ind geoinfo_layers_ind
     end
-    
-    co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
+
+co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 
 %% Select starting point
 % Make NaN matrix for 8 possible layers
