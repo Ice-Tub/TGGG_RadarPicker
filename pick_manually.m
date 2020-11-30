@@ -140,6 +140,7 @@ if load_crossover
     co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 
+dt=geoinfo.time_range(2)-geoinfo.time_range(1);%time step (for traces)
 time_surface = geoinfo.traveltime_surface-geoinfo.time_range(1);
 surface_ind = time_surface/dt;
 %% Select starting point
