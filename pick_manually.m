@@ -31,7 +31,7 @@ tp.smooth_sur=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
 tp.MinBinForBottomPick = 1500; 
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
-tp.RefHeight=500; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
+tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
 %clms=6000:8000; %for 6 
 tp.clms=4000:6000; %for 3 
@@ -46,6 +46,12 @@ ind = find(geoinfo.peakim);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
 nx = size(geoinfo.echogram,2);
 
+dt=geoinfo.time_range(2)-geoinfo.time_range(1);%time step (for traces)
+time_surface = geoinfo.traveltime_surface-geoinfo.time_range(1);
+surface_ind = time_surface/dt;
+
+dz = dt/2*1.68e8;
+binshift = round((tp.RefHeight - geoinfo.elevation_surface)/dz);%this is essentially the surface reflector 
 %%
 f = figure(2); % of flat data with seed points
 imagesc(mag2db(geoinfo.echogram));
@@ -93,7 +99,7 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
-S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
+S = "geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.layers_topo = layers_topo; geoinfo.layers_topo_depth = layers_topo_depth; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
  
@@ -140,9 +146,6 @@ if load_crossover
     co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 
-dt=geoinfo.time_range(2)-geoinfo.time_range(1);%time step (for traces)
-time_surface = geoinfo.traveltime_surface-geoinfo.time_range(1);
-surface_ind = time_surface/dt;
 %% Select starting point
 % Make NaN matrix for 8 possible layers
 if isfield(geoinfo,'layers')
@@ -216,6 +219,8 @@ end
 layers(cl,:) = layer;
 qualities(cl,:) = quality;
 layers_relto_surface = layers - surface_ind;
+layers_topo = layers_relto_surface + binshift;
+layers_topo_depth = tp.RefHeight - layers_topo * dz;
 % Plot updated layer
 try
     delete(layerplot);
@@ -226,9 +231,15 @@ disp('Picking finished. Picked layers are saved.')
 
 
 %% save layer
+layers_relto_surface = layers - surface_ind;
+layers_topo = layers_relto_surface + binshift;
+layers_topo_depth = tp.RefHeight - layers_topo * dz;
+
 geoinfo.num_layer = sum(max(~isnan(layers),[],2));
 geoinfo.layers = layers;
 geoinfo.layers_relto_surface = layers_relto_surface;
+geoinfo.layers_topo = layers_topo;
+geoinfo.layers_topo_depth = layers_topo_depth;
 geoinfo.qualities = qualities;
 geoinfo.tp = tp;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
