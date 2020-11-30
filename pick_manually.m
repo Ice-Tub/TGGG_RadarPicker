@@ -90,7 +90,7 @@ uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpo
                 'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
 cl = 1; % Set number of current layers
-S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',geoinfo_layers_ind(cl)); end";
+S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',cross_point_layers(cl)); end";
 ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8'},'Units','normalized','Position',cpos,...
               'value',cl,'callback',S); % Choose layer.
           
@@ -112,38 +112,56 @@ ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units
 % need to load geoinfo3 manually 
 
 if load_crossover
+    cross_point_idx = NaN;
+    cross_point_layers = NaN(8,1);
+    
     geoinfo_co = load(filename_crossover); % Loading the cross-over file
     if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
         [geoinfo_co.psX,geoinfo_co.psY] = ll2ps(geoinfo_co.latitude,geoinfo_co.longitude); %convert to polar stereographic
     end
+    
+    P = [geoinfo.psX; geoinfo.psY]';
+    P_co= [geoinfo_co.psX; geoinfo_co.psY]';
+    [k,dist] = dsearchn(P,P_co);
+    
+    [val_dist, pos_dist] = min(dist);
+    
+    distthresh  = 10;  % Minimal allowed distance between cross- or neighbour-points.
+    if val_dist < 10
+        geoinfo_co_idx = pos_dist;
+        geoinfo_idx = k(pos_dist);
+    end
+    
+    if exist('geoinfo_co_idx', 'var')
+        %figure(3)
+        %plot(P(:,1),P(:,2),'ko')
+        %hold on
+        %plot(P_co(:,1),P_co(:,2),'*g')
+        %hold on
+        %plot(P(geoinfo_idx,1),P(geoinfo_idx,2),'*r')
+        %figure(2)
 
-    [xi,yi] = polyxpoly(geoinfo.psX,geoinfo.psY,geoinfo_co.psX,geoinfo_co.psY); %selecting the polar stereographic 
-    %coordinates of overlapping profiles
-    %check
-    %figure(3)
-    %plot(geoinfo.psX,geoinfo.psY,'b-o')
-    %hold on
-    %plot(geoinfo_co.psX,geoinfo_co.psY,'r-o')
-    %plot(xi,yi,'g*')
+        geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
+        dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
 
-    %round to closest intercept (only use longitude?)
-    [~,geoinfo_idx]=min(abs(geoinfo.psX-xi));
-    %geoinfominVal=geoinfo.psX(geoinfoidx);
+        geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
+        geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
 
-    [~,geoinfo_co_idx]=min(abs(geoinfo_co.psX-xi));
-    %geoinfominVal=geoinfo_co.psX(geoinfo_co_idx);
-
-    geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
-    dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
-
-    geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
-    geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
-
-    %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
-    geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
-    geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
-
-    co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
+        %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
+        geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
+        geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
+        
+        if any(cross_point_layers)
+            cross_point_idx = [cross_point_idx, geoinfo_idx];
+            cross_point_layers = [cross_point_layers, geoinfo_layers_ind];
+        else
+            cross_point_idx = geoinfo_idx;
+            cross_point_layers = geoinfo_layers_ind;
+        end 
+        clear geoinfo_co_layers_ind geoinfo_layers_ind
+    end
+    
+    co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 
 %% Select starting point
