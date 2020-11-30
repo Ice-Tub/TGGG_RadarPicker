@@ -36,9 +36,9 @@ tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and botto
 %clms=6000:8000; %for 6 
 tp.clms=4000:6000; %for 3 
 %%
-filename_raw_data = append(pwd,'\..\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd,'\..\pick_data\LayerData_',input_section,'.mat');
-filename_crossover = append(pwd,'\..\pick_data\LayerData_',cross_section,'.mat');
+filename_raw_data = append(pwd,'\raw_data\TopoallData_20190107_01_',input_section,'.mat'); % Don't needed if geoinfofile already exists.
+filename_geoinfo = append(pwd,'\pick_data\LayerData_',input_section,'.mat');
+filename_crossover = append(pwd,'\pick_data\LayerData_',cross_section,'.mat');
 
 geoinfo = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
 
