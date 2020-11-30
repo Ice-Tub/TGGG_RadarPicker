@@ -140,7 +140,7 @@ if load_crossover
     co_plot = plot(geoinfo_idx,geoinfo_layers_ind,'k*', geoinfo_idx, geoinfo_layers_ind(cl),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 end
 
-time_surface = geoinfo.traveltime_surface-geoinfo_co.time_range(1);
+time_surface = geoinfo.traveltime_surface-geoinfo.time_range(1);
 surface_ind = time_surface/dt;
 %% Select starting point
 % Make NaN matrix for 8 possible layers
