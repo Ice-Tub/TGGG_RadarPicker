@@ -56,7 +56,7 @@ function [geoinfo,echogram] = readdata(filename, rows, clms)
  
     fdnames = {'distance','elevation_bed','elevation_surface',...
         'latitude','longitude','num_layer','num_trace','thickness',...
-        'time_gps','traveltime_surface','x','y','layer',...
+        'time_gps','traveltime_surface','x','y',...
         'traveltime_bottom','time_range'}; %last two fields added by XST
     
     ntcfield = 11;
@@ -101,10 +101,7 @@ function [geoinfo,echogram] = readdata(filename, rows, clms)
             case 7
                 geoinfo.num_trace = ntrace;
 %                nfd = nfd + 1;
-%            case 13
-%                geoinfo.layer = [];
-%                nfd = nfd + 1;
-            case 15
+            case 14
                 geoinfo.time_range = Time;
             otherwise
                 geoinfo.(fdnames{i}) = traceData(ndata,:);
