@@ -12,6 +12,8 @@ function [geoinfo] = figure_tune(tp,filename_raw_data,filename_geoinfo,create_ne
 if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; save preprocessed file on computer to save time.
     geoinfo = load(filename_geoinfo);
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
+    tp.rows = geoinfo.tp.rows;
+    tp.clms = geoinfo.tp.clms;
 else
     [geoinfo,echogram] = readdata2(filename_raw_data,tp.rows,tp.clms); % from ARESELP
 
