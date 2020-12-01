@@ -15,12 +15,13 @@ input_section = '009'; % Current section to pick new layers.
 cross_section = 'all'; % {'009'; '006'};  % Options : List of numbers (e.g.:{'009'; '006'}) or all files in data_folder('all'). Some already pick section to find cross-points.
 raw_folder = '\raw_data';
 raw_prefix = '\TopoallData_20190107_01_';
-output_folder = '\pick_data';
+output_folder = '\picked layers';
 output_prefix = '\LayerData_';
 create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 keep_old_picks = 1;     % 1 = yes, 0 = no
 load_crossover = 1;     % 1 = yes, 0 = no
-len_color_range = 140;
+len_color_range = 100;
+cmp = 'jet'; % e.g. 'jet', 'bone'
 
 %TUNING PARAMETERS
 tp.window=9; %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
@@ -33,7 +34,7 @@ tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is be
 tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
 tp.smooth_sur=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
-tp.MinBinForBottomPick = 1500; 
+tp.MinBinForBottomPick = 1000; 
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
@@ -59,7 +60,7 @@ end
 filenames_cross = setdiff(filenames_cross, {filename_geoinfo});
 n_cross = length(filenames_cross);
 
-geoinfo = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
+[geoinfo, tp] = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
 
 ind = find(geoinfo.peakim);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
@@ -72,11 +73,12 @@ surface_ind = time_surface/dt;
 dz = dt/2*1.68e8;
 binshift = round((tp.RefHeight - geoinfo.elevation_surface)/dz);%this is essentially the surface reflector 
 %%
+db_echogram = mag2db(geoinfo.echogram);
 f = figure(2); % of flat data with seed points
-imagesc(mag2db(geoinfo.echogram));
-colormap(jet)
+imagesc(db_echogram);
+colormap(cmp)
 hold on
-plot(sx,sy,'r*') % plot seedpoints
+plot(sx,sy,'r*', 'MarkerSize', 2) % plot seedpoints
 set(gcf,'doublebuffer','on');
 a = gca;
 cr_half = len_color_range/2;
@@ -91,11 +93,12 @@ fpos=[apos(3)/3+0.54 apos(2)-0.05 0.12 0.05];
 
 
 
-cmin = round(min(mag2db(geoinfo.echogram),[],'all')+cr_half); 
-cmax = round(max(mag2db(geoinfo.echogram),[],'all')-cr_half);
+cmin = round(min(db_echogram,[],'all')+cr_half); 
+cmax = round(max(db_echogram,[],'all')-cr_half);
 cini = min(cmax,-150);
 set(a,'CLim',[cini-cr_half cini+cr_half]); % Initial color range
 
+clear db_echogram
 % Create color slider
 S = "set(gca,'CLim',[get(gcbo,'value')-cr_half, get(gcbo,'value')+cr_half])";
 ui_b = uicontrol('Parent',f,'Style','slider','Units','normalized','Position',bpos,...
