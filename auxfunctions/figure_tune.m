@@ -14,6 +14,7 @@ if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; s
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
     tp.rows = geoinfo.tp.rows;
     tp.clms = geoinfo.tp.clms; 
+    tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks; 
 
 
 
