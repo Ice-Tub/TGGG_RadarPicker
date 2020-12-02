@@ -1,4 +1,4 @@
-function [geoinfo,echogram] = readdata(filename, rows, clms)
+function [geoinfo] = readdata(filename, rows, clms)
 %--------------------------------------------------------------
 % Read geoinfo and other Meta info from MATFILE
 %
@@ -21,7 +21,7 @@ function [geoinfo,echogram] = readdata(filename, rows, clms)
 %
 % Examples
 % --------
-% [geoinfo, echogram] = read_data('Data_20110329_02_019.mat');
+% [geoinfo] = read_data('Data_20110329_02_019.mat');
 %---------------------------------------------------------------
     Bottom = clms*0.0+11e-6; %set initial bottom pick as horizontal line (was implemented as a function argument before)
     
@@ -57,7 +57,7 @@ function [geoinfo,echogram] = readdata(filename, rows, clms)
     fdnames = {'distance','elevation_bed','elevation_surface',...
         'latitude','longitude','num_layer','num_trace','thickness',...
         'time_gps','traveltime_surface','x','y',...
-        'traveltime_bottom','time_range'}; %last two fields added by XST
+        'traveltime_bottom','time_range','echogram'}; %last two fields added by XST
     
     ntcfield = 11;
     ntrace = size(Data,2);
@@ -103,6 +103,8 @@ function [geoinfo,echogram] = readdata(filename, rows, clms)
 %                nfd = nfd + 1;
             case 14
                 geoinfo.time_range = Time;
+            case 15
+                geoinfo.echogram = echogram;
             otherwise
                 geoinfo.(fdnames{i}) = traceData(ndata,:);
                 ndata = ndata + 1;

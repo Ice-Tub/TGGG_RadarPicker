@@ -1,4 +1,4 @@
-function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram,trimrows)
+function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
 %--------------------------------------------------------------
 % Calcuate echogram in dB units and the row numbers of surface and bottom layers
 %
@@ -34,13 +34,13 @@ function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram,trimrows)
         trimrows = 300; %trimrows = 300, 0 for pre-icebridge
     end
     % convert the format of the echogram
-    if sum(echogram(:)) < 0
+    if sum(geoinfo.echogram(:)) < 0
         % pre *** the MCoRDS data has already converted to dB
         imDat = [];
-        imAmp = echogram;
+        imAmp = geoinfo.echogram;
     else
-        imDat = echogram;
-        imAmp = 10*log10(echogram);
+        imDat = geoinfo.echogram;
+        imAmp = 10*log10(geoinfo.echogram);
     end
     % trim the bottom weird area of the echogram
     imAmp(size(imAmp,1) - trimrows + 1:end,:) = [];

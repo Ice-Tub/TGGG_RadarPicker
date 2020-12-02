@@ -1,4 +1,4 @@
-function [geoinfo] = pick_bottom(geoinfo,MinBinForBottomPick,smooth2, num_bottom_peak)
+function [geoinfo] = pick_bottom(geoinfo,MinBinForBottomPick,smooth2, num_bottom_peaks)
 
     if nargin < 2
         MinBinForBottomPick =   1500;
@@ -19,7 +19,7 @@ function [geoinfo] = pick_bottom(geoinfo,MinBinForBottomPick,smooth2, num_bottom
     FirstArrivalInds = zeros(1,geoinfo.num_trace);
     [~,FirstArrivalInds(1)] = max(normalized_echogram(MinBinForBottomPick:end,1));
     for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_echogram(MinBinForBottomPick:end,n),'SortStr','descend','NPeaks',num_bottom_peak);
+        [~,Ind] = findpeaks(normalized_echogram(MinBinForBottomPick:end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
         [~, pos] = min(abs(Ind-FirstArrivalInds(n-1)));
         FirstArrivalInds(n) = Ind(pos);
     end
