@@ -20,8 +20,7 @@ elseif 0 % Comment out to get new bottom and seed points of existing LayerData
 
     echogram = geoinfo.echogram;
     geoinfo = pick_surface(geoinfo,echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
-    geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot);
-
+    geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot, tp.num_bottom_peaks);
     %wavelet part
     minscales=3;
     scales = minscales:tp.maxwavelet; % definition from ARESELP
@@ -33,8 +32,10 @@ elseif 0 % Comment out to get new bottom and seed points of existing LayerData
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
     
     clear peakim imAmp ysrf ybtm echogram scales
-     
-    geoinfo = rmfield(geoinfo,'layer');
+    
+    try
+        geoinfo = rmfield(geoinfo,'layer');
+    end
     [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
     
     save(filename_geoinfo, '-struct', 'geoinfo')
@@ -47,7 +48,7 @@ else
     %pick main reflectors (the bottom pick is very important for background
     %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
     geoinfo = pick_surface(geoinfo,echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
-    geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot);
+    geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot, tp.num_bottom_peaks);
 
     %wavelet part
     minscales=3;
