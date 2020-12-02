@@ -13,33 +13,14 @@ if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; s
     geoinfo = load(filename_geoinfo);
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
     tp.rows = geoinfo.tp.rows;
-    tp.clms = geoinfo.tp.clms;
+    tp.clms = geoinfo.tp.clms; 
 
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%
-elseif 0 % Comment out to get new bottom and seed points of existing LayerData    
 
-    echogram = geoinfo.echogram;
-    geoinfo = pick_surface(geoinfo,echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
-    geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot, tp.num_bottom_peaks);
-    %wavelet part
-    minscales=3;
-    scales = minscales:tp.maxwavelet; % definition from ARESELP
 
-    %calculate seedpoints
-    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram);
-    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
-    geoinfo.peakim = peakim;
-    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
-    
-    clear peakim imAmp ysrf ybtm echogram scales
     
     try
         geoinfo = rmfield(geoinfo,'layer');
     end
-    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-    
-    save(filename_geoinfo, '-struct', 'geoinfo')
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 else
     [geoinfo,echogram] = readdata2(filename_raw_data,tp.rows,tp.clms); % from ARESELP
 
