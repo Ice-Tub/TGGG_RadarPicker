@@ -39,7 +39,7 @@ tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick.
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-tp.clms=1:5000;
+tp.clms=1:5000; % If an existing file is loaded, this option is overwritten.
 %%
 filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
 filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');

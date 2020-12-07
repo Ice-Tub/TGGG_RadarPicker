@@ -23,9 +23,7 @@ if isfile(filename_geoinfo) && ~create_new_geoinfo % For programming purposes; s
         geoinfo = rmfield(geoinfo,'layer');
     end
 else
-    [geoinfo,echogram] = readdata2(filename_raw_data,tp.rows,tp.clms); % from ARESELP
-
-    geoinfo.echogram=echogram;
+    [geoinfo] = readdata2(filename_raw_data,tp.rows,tp.clms); % from ARESELP
 
     %pick main reflectors (the bottom pick is very important for background
     %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
