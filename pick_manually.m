@@ -22,7 +22,7 @@ output_prefix = '\LayerData_';
 opt.create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 opt.update_bottom = 1;      % 1 = yes, 0 = no. Update bottom, when old geoinfo is loaded.
 opt.keep_old_picks = 1;     % 1 = yes, 0 = no. Keep old picks, when old geoinfo is loaded.
-opt.load_crossover = 0;     % 1 = yes, 0 = no
+opt.load_crossover = 1;     % 1 = yes, 0 = no
 len_color_range = 100;
 cmp = 'jet'; % e.g. 'jet', 'bone'
 
