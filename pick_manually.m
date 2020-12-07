@@ -13,15 +13,16 @@ close all;
 addpath(append(pwd,'\auxfunctions'))
 
 % Settings
-input_section = '004'; % Current section to pick new layers.
+input_section = '008'; % Current section to pick new layers.
 cross_section = 'all'; % {'009'; '006'};  % Options : List of numbers (e.g.:{'009'; '006'}) or all files in data_folder('all'). Some already pick section to find cross-points.
 raw_folder = '\raw_data';
 raw_prefix = '\TopoallData_20190107_01_';
 output_folder = '\picked layers';
 output_prefix = '\LayerData_';
-create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
-keep_old_picks = 1;     % 1 = yes, 0 = no
-load_crossover = 1;     % 1 = yes, 0 = no
+opt.create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
+opt.update_bottom = 1;      % 1 = yes, 0 = no. Update bottom, when old geoinfo is loaded.
+opt.keep_old_picks = 1;     % 1 = yes, 0 = no. Keep old picks, when old geoinfo is loaded.
+opt.load_crossover = 0;     % 1 = yes, 0 = no
 len_color_range = 100;
 cmp = 'jet'; % e.g. 'jet', 'bone'
 
@@ -37,88 +38,35 @@ tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
 tp.smooth_sur=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
 tp.MinBinForBottomPick = 1000;
-tp.num_bottom_peaks = 1; % Number of strongest peaks considered as bottom pick. 10 is a good guess.
+tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
 tp.clms=1:9000; % Only needs to be set, when new geoinfo is created.
 %%
-filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
-filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');
-filenames_cross = {};
-if strcmp(cross_section,'all')
-    cross_struct = dir(append(pwd,output_folder,'\*.mat'));
-    n_cross = length(cross_struct);
-    for k = 1:n_cross
-        filename_cross = append(cross_struct(k).folder, '\', cross_struct(k).name);
-        filenames_cross = [filenames_cross; filename_cross];
+opt.filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
+opt.filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');
+if opt.load_crossover
+    filenames_cross = {};
+    if strcmp(cross_section,'all')
+        cross_struct = dir(append(pwd,output_folder,'\*.mat'));
+        n_cross = length(cross_struct);
+        for k = 1:n_cross
+            filename_cross = append(cross_struct(k).folder, '\', cross_struct(k).name);
+            filenames_cross = [filenames_cross; filename_cross];
+        end
+    else
+        n_cross = numel(cross_section);
+        for k = 1:n_cross
+            filename_cross = append(pwd,output_folder,output_prefix,cross_section{k},'.mat');
+            filenames_cross = [filenames_cross; filename_cross];
+        end
     end
-else
-    n_cross = numel(cross_section);
-    for k = 1:n_cross
-        filename_cross = append(pwd,output_folder,output_prefix,cross_section{k},'.mat');
-        filenames_cross = [filenames_cross; filename_cross];
-    end
+    opt.filenames_cross = setdiff(filenames_cross, {opt.filename_geoinfo});
+    n_cross = length(opt.filenames_cross);
 end
-filenames_cross = setdiff(filenames_cross, {filename_geoinfo});
-n_cross = length(filenames_cross);
-
-[geoinfo, tp] = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
+[geoinfo, tp] = figure_tune(tp,opt);
 %%
-
-%wavelet part
-if ~isfile(filename_geoinfo) || create_new_geoinfo % For programming purposes; save preprocessed file on computer to save time.
-    minscales=3;
-    scales = minscales:tp.maxwavelet; % definition from ARESELP
-
-    %calculate seedpoints
-    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo);
-    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
-    geoinfo.peakim = peakim;
-    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
-
-    clear peakim imAmp ysrf ybtm echogram scales
-
-
-    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-
-    if isfile(filename_geoinfo) && keep_old_picks
-        geoinfo_old = load(filename_geoinfo);
-        geoinfo.num_layer = geoinfo_old.num_layer;
-        geoinfo.layers = geoinfo_old.layers;
-        geoinfo.qualities = geoinfo_old.qualities;
-        clear geoinfo_old
-    end
-
-    geoinfo.tp = tp;
-    save(filename_geoinfo, '-struct', 'geoinfo')
-else
-    minscales=3;
-    scales = minscales:tp.maxwavelet; % definition from ARESELP
-
-    %calculate seedpoints
-    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo);
-    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
-    geoinfo.peakim = peakim;
-    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
-
-    clear peakim imAmp ysrf ybtm echogram scales
-
-
-    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-
-    if isfile(filename_geoinfo) && keep_old_picks
-        geoinfo_old = load(filename_geoinfo);
-        geoinfo.num_layer = geoinfo_old.num_layer;
-        geoinfo.layers = geoinfo_old.layers;
-        geoinfo.qualities = geoinfo_old.qualities;
-        clear geoinfo_old
-    end
-
-    geoinfo.tp = tp;
-    %save(filename_geoinfo, '-struct', 'geoinfo')
-end
-
 ind = find(geoinfo.peakim);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
 nx = size(geoinfo.echogram,2);
@@ -178,7 +126,7 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
-S = "layers_relto_surface = layers - surface_ind; layers_topo = layers_relto_surface + binshift; layers_topo_depth = tp.RefHeight - layers_topo * dz;geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.layers_topo = layers_topo; geoinfo.layers_topo_depth = layers_topo_depth; geoinfo.qualities = qualities; geoinfo.tp = tp; save(filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
+S = "layers_relto_surface = layers - surface_ind; layers_topo = layers_relto_surface + binshift; layers_topo_depth = tp.RefHeight - layers_topo * dz;geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.layers_topo = layers_topo; geoinfo.layers_topo_depth = layers_topo_depth; geoinfo.qualities = qualities; geoinfo.tp = tp; save(opt.filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
  
@@ -192,7 +140,7 @@ ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units
 
 cross_point_idx = NaN;
 cross_point_layers = NaN(8,1);
-if load_crossover
+if opt.load_crossover
     for k = 1:n_cross
         geoinfo_co = load(filenames_cross{k}); % Loading the cross-over file
         if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
@@ -341,4 +289,4 @@ geoinfo.layers_topo_depth = layers_topo_depth;
 geoinfo.qualities = qualities;
 geoinfo.tp = tp;
 %geoinfo.layer1(geoinfoidx,2)=geoinfolayer1_ind; %still keep the overlapping point in the data
-save(filename_geoinfo, '-struct', 'geoinfo')
+save(opt.filename_geoinfo, '-struct', 'geoinfo')

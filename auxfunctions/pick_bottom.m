@@ -1,25 +1,28 @@
-function [geoinfo] = pick_bottom(geoinfo,MinBinForBottomPick,smooth2, num_bottom_peaks)
+function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
 
-    if nargin < 2
-        MinBinForBottomPick =   1500;
-    end
+    smooth2 = tp.smooth_bot;
+    num_bottom_peaks = tp.num_bottom_peaks;
+    
+    %if nargin < 2
+    %    MinBinForBottomPick =   1500;
+    %end
 
-    if nargin < 3
-    smooth2 =   200;
-    end
+    %if nargin < 3
+    %smooth2 =   200;
+    %end
 
-    if nargin < 4
-        num_bottom_peak = 5;
-    end
+    %if nargin < 4
+    %    num_bottom_peak = 5;
+    %end
     
     db_echogram = mag2db(geoinfo.echogram);
     horizontal_mean = mean(db_echogram,2);    
     normalized_echogram = db_echogram - horizontal_mean;
     
     FirstArrivalInds = zeros(1,geoinfo.num_trace);
-    [~,FirstArrivalInds(1)] = max(normalized_echogram(MinBinForBottomPick:end,1));
+    [~,FirstArrivalInds(1)] = max(normalized_echogram(MinBottomPick(1):end,1));
     for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_echogram(MinBinForBottomPick:end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
+        [~,Ind] = findpeaks(normalized_echogram(MinBottomPick(n):end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
         [~, pos] = min(abs(Ind-FirstArrivalInds(n-1)));
         FirstArrivalInds(n) = Ind(pos);
     end
@@ -31,7 +34,7 @@ function [geoinfo] = pick_bottom(geoinfo,MinBinForBottomPick,smooth2, num_bottom
     %plot(1:length(horizontal_min),horizontal_min)
    
     %FirstArrivalInds = floor(movmean(FirstArrivalInds,smooth2));
-    FirstArrivalInds = FirstArrivalInds+MinBinForBottomPick;
+    FirstArrivalInds = FirstArrivalInds+MinBottomPick;
 
     dt=geoinfo.time_range(2)-geoinfo.time_range(1);
     t1=geoinfo.time_range(1);
