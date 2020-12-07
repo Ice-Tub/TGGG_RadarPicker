@@ -6,12 +6,14 @@
 %automatically zoom into layer
 %automatically adjust color bar - by setting the maximum a certain color in
 
+% ToDo: tp in all files, topo in all files, bottom layer, load to current
+% collumns
 clear all; 
 close all;
 addpath(append(pwd,'\auxfunctions'))
 
 % Settings
-input_section = '009'; % Current section to pick new layers.
+input_section = '004'; % Current section to pick new layers.
 cross_section = 'all'; % {'009'; '006'};  % Options : List of numbers (e.g.:{'009'; '006'}) or all files in data_folder('all'). Some already pick section to find cross-points.
 raw_folder = '\raw_data';
 raw_prefix = '\TopoallData_20190107_01_';
@@ -34,12 +36,12 @@ tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is be
 tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
 tp.smooth_sur=40; %between 30 and 60 seems to be good
 %MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
-tp.MinBinForBottomPick = 1000; 
-tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick.
+tp.MinBinForBottomPick = 1000;
+tp.num_bottom_peaks = 1; % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-tp.clms=1:5000;
+tp.clms=1:9000; % Only needs to be set, when new geoinfo is created.
 %%
 filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
 filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');
@@ -62,6 +64,60 @@ filenames_cross = setdiff(filenames_cross, {filename_geoinfo});
 n_cross = length(filenames_cross);
 
 [geoinfo, tp] = figure_tune(tp,filename_raw_data,filename_geoinfo,create_new_geoinfo,keep_old_picks);
+%%
+
+%wavelet part
+if ~isfile(filename_geoinfo) || create_new_geoinfo % For programming purposes; save preprocessed file on computer to save time.
+    minscales=3;
+    scales = minscales:tp.maxwavelet; % definition from ARESELP
+
+    %calculate seedpoints
+    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo);
+    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
+    geoinfo.peakim = peakim;
+    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
+
+    clear peakim imAmp ysrf ybtm echogram scales
+
+
+    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
+
+    if isfile(filename_geoinfo) && keep_old_picks
+        geoinfo_old = load(filename_geoinfo);
+        geoinfo.num_layer = geoinfo_old.num_layer;
+        geoinfo.layers = geoinfo_old.layers;
+        geoinfo.qualities = geoinfo_old.qualities;
+        clear geoinfo_old
+    end
+
+    geoinfo.tp = tp;
+    save(filename_geoinfo, '-struct', 'geoinfo')
+else
+    minscales=3;
+    scales = minscales:tp.maxwavelet; % definition from ARESELP
+
+    %calculate seedpoints
+    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo);
+    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
+    geoinfo.peakim = peakim;
+    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
+
+    clear peakim imAmp ysrf ybtm echogram scales
+
+
+    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
+
+    if isfile(filename_geoinfo) && keep_old_picks
+        geoinfo_old = load(filename_geoinfo);
+        geoinfo.num_layer = geoinfo_old.num_layer;
+        geoinfo.layers = geoinfo_old.layers;
+        geoinfo.qualities = geoinfo_old.qualities;
+        clear geoinfo_old
+    end
+
+    geoinfo.tp = tp;
+    %save(filename_geoinfo, '-struct', 'geoinfo')
+end
 
 ind = find(geoinfo.peakim);
 [sy,sx]=ind2sub(size(geoinfo.peakim), ind);
@@ -215,7 +271,7 @@ if iteration == 1
     disp('Pick the first point. Only the last click is saved, confirm pick with enter.')
     iteration = iteration + 1;
 else
-	disp('Pick next point. To move or zoom, press enter.')
+   disp('Pick next point. To move or zoom, press enter.')
 end
 
 [x,y,type]=ginput(); %gathers points until return
