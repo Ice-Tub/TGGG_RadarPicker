@@ -5,7 +5,7 @@ function [geoinfo, tp] = figure_tune(tp,opt)
 % Building a while loop for tuneing the figure parameters.
 %presettings_ok = 0;
 %while ~presettings_ok
-%    
+%
 %    presettings_ok = 1;
 %end
 
@@ -19,8 +19,8 @@ else
     geoinfo = load(opt.filename_geoinfo);
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
     tp.rows = geoinfo.tp.rows;
-    tp.clms = geoinfo.tp.clms; 
-    tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks; 
+    tp.clms = geoinfo.tp.clms;
+    tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks;
 end
 
 % Create background plot.
@@ -28,7 +28,7 @@ f1 = figure(1);
 imagesc(tp.clms,geoinfo.time_range,(mag2db(geoinfo.echogram)));
 colormap(bone)
 colorbar
-hold on 
+hold on
 
 % Include and update surface and bottom pick.
 update_plot = 1;
@@ -38,7 +38,7 @@ dt=geoinfo.time_range(2)-geoinfo.time_range(1);
 t1=geoinfo.time_range(1);
 while update_plot
     if manual_MBFBP
-        disp('Pick a variable MinBinForBottomPick.')      
+        disp('Pick a variable MinBinForBottomPick.')
         [x,y,~]=ginput(); %gathers points until return
 
         if ~isempty(x)
@@ -52,26 +52,26 @@ while update_plot
             MinBinBottom = round(MinBinBottom');
         end
     end
-    
+
     if opt.update_bottom
         %pick main reflectors (the bottom pick is very important for background
         %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
         geoinfo = pick_surface(geoinfo,geoinfo.echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
         geoinfo = pick_bottom(geoinfo, tp, MinBinBottom);
     end
-    
+
     % Lines for testting: delete if finished.
     %geoinfo = pick_bottom(geoinfo,tp.MinBinForBottomPick,tp.smooth_bot, tp.num_bottom_peaks);
     %opt.update_bottom = 1
-    
-    
+
+
     % Delete existing surface and bottom pick
     if exist('botplot','var')
         delete(surplot);
         delete(minplot);
         delete(botplot);
     end
-    
+
     MinBinBottomPlot=(MinBinBottom*dt)+t1;
     % plot new surface and bottom pick
     surplot = plot(tp.clms,geoinfo.traveltime_surface,'Linewidth',2, 'Color', [0    0.4470    0.7410]);
@@ -81,10 +81,10 @@ while update_plot
     botplot = plot(tp.clms,geoinfo.traveltime_bottom,'Linewidth',2, 'Color', [0.8500    0.3250    0.0980]);
     hold on
     %set(gcf,'doublebuffer','on');
-    
+
     if opt.update_bottom
         disp('Show surface and bottom picks.')
-      
+
         prompt = {'Number of bottom peaks:','Pick MinBinForBottomPick manually (1=yes, 0=no):'};
         dlgtitle = 'Update bottom pick?';
         dims = [1 35];

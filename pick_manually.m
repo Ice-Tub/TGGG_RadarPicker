@@ -8,7 +8,7 @@
 
 % ToDo: tp in all files, topo in all files, bottom layer, load to current
 % collumns
-clear all; 
+clear all;
 close all;
 addpath(append(pwd,'\auxfunctions'))
 
@@ -30,7 +30,7 @@ cmp = 'jet'; % e.g. 'jet', 'bone'
 tp.window=9; %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
 tp.seedthresh=5;% 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
 %wavelet parameters
-tp.wavelet = 'mexh';% choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results 
+tp.wavelet = 'mexh';% choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results
 tp.maxwavelet=16; %min is always 3, layers size is half the wavelet scale
 % decide how many pixels below bed layer is counted as background noise:
 tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
@@ -42,7 +42,7 @@ tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick. 
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-tp.clms=1:9000; % Only needs to be set, when new geoinfo is created.
+tp.clms=1:5000; % If an existing file is loaded, this option is overwritten.
 %%
 opt.filename_raw_data = append(pwd, raw_folder, raw_prefix, input_section, '.mat'); % Don't needed if geoinfofile already exists.
 opt.filename_geoinfo = append(pwd, output_folder, output_prefix, input_section, '.mat');
@@ -76,7 +76,7 @@ time_surface = geoinfo.traveltime_surface-geoinfo.time_range(1);
 surface_ind = time_surface/dt;
 
 dz = dt/2*1.68e8;
-binshift = round((tp.RefHeight - geoinfo.elevation_surface)/dz);%this is essentially the surface reflector 
+binshift = round((tp.RefHeight - geoinfo.elevation_surface)/dz);%this is essentially the surface reflector
 %%
 db_echogram = mag2db(geoinfo.echogram);
 f = figure(2); % of flat data with seed points
@@ -98,7 +98,7 @@ fpos=[apos(3)/3+0.54 apos(2)-0.05 0.12 0.05];
 
 
 
-cmin = round(min(db_echogram,[],'all')+cr_half); 
+cmin = round(min(db_echogram,[],'all')+cr_half);
 cmax = round(max(db_echogram,[],'all')-cr_half);
 cini = min(cmax,-150);
 set(a,'CLim',[cini-cr_half cini+cr_half]); % Initial color range
@@ -120,7 +120,7 @@ cl = 1; % Set number of current layers
 S = "cl = get(gcbo,'value'); try set(layerplot(end),'YData',layers(cl,:)); end; try set(co_plot(end),'YData',cross_point_layers(cl,:)); end";
 ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8'},'Units','normalized','Position',cpos,...
               'value',cl,'callback',S); % Choose layer.
-          
+
 leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
 S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
@@ -129,14 +129,14 @@ ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units',
 S = "layers_relto_surface = layers - surface_ind; layers_topo = layers_relto_surface + binshift; layers_topo_depth = tp.RefHeight - layers_topo * dz;geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.layers_topo = layers_topo; geoinfo.layers_topo_depth = layers_topo_depth; geoinfo.qualities = qualities; geoinfo.tp = tp; save(opt.filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
 ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
               'callback',S); % Finish selection
- 
+
 S = "set(ui_f, 'UserData', 0);";
 ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
               'Callback',S,'UserData', 1); % Finish selection
 
 
 %% Figure out cross-overs (load geoinfo3 in this case)
-% need to load geoinfo3 manually 
+% need to load geoinfo3 manually
 
 cross_point_idx = NaN;
 cross_point_layers = NaN(8,1);
@@ -184,7 +184,7 @@ if opt.load_crossover
             elseif exist('geoinfo_layers_ind', 'var')
                 cross_point_idx = geoinfo_idx;
                 cross_point_layers = geoinfo_layers_ind;
-            end 
+            end
             clear geoinfo_co_layers_ind geoinfo_layers_ind geoinfo_co_idx geoinfo_idx
         end
     end
@@ -239,7 +239,7 @@ if type_in == 1
     picks{cl}(end+1,:) = [x_in, y_in]; % Add new picks to pick-cell
 
     isnewlayer = all(isnan(layer), 'all'); % Check if layer is empty (True/False).
-    
+
     [layer,quality] = propagate_layer(layer,quality,geoinfo,tp.window,x_in,y_in,leftright);
     if isnewlayer
         [layer,quality] = propagate_layer(layer,quality,geoinfo,tp.window,x_in,y_in,-leftright);
