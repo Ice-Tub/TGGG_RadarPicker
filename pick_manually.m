@@ -1,16 +1,5 @@
-%to fix next
-%optimize loop below
-%how to start & stop a layer?
-%automatically name layers by e.g. profile name and ind below surface pick
-%(&maybe by polar x and y)
-%automatically zoom into layer
-%automatically adjust color bar - by setting the maximum a certain color in
-
-% ToDo: tp in all files, topo in all files, bottom layer, load to current
-% collumns
 clear all;
 close all;
-addpath(append(pwd,'\auxfunctions'))
 
 % Settings
 opt.input_section = '009'; % Current section to pick new layers.
@@ -36,7 +25,6 @@ tp.maxwavelet=16; %min is always 3, layers size is half the wavelet scale
 tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is better
 tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
 tp.smooth_sur=40; %between 30 and 60 seems to be good
-%MinBinForBottomPick = 1500; %should be double-checked on first plot (as high as possible)
 tp.MinBinForBottomPick = 1000;
 tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.editing_window = 10; % Number of traces that are ubdated in editing mode.
@@ -46,4 +34,5 @@ tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and botto
 tp.clms=1:4181; % If an existing file is loaded, this option is overwritten.
 
 %%
+addpath(append(pwd,'\auxfunctions'))
 run_picker(opt, tp)
