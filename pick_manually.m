@@ -31,7 +31,7 @@ tp.editing_window = 10; % Number of traces that are ubdated in editing mode.
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok
 tp.RefHeight=600; %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 tp.rows=1000:5000; %cuts the radargram to limit processing (time) (top and bottom)
-tp.clms=1:4181; % If an existing file is loaded, this option is overwritten.
+tp.clms=1:4000; % If an existing file is loaded, this option is overwritten.
 
 %%
 addpath(append(pwd,'\auxfunctions'))
