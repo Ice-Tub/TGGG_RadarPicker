@@ -91,10 +91,11 @@ cr_half = len_color_range/2;
 apos=get(a,'position');
 set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
 bpos=[apos(1) apos(2)-0.05 apos(3)/3 0.05];
-cpos=[apos(3)/3+0.15 apos(2)-0.05 0.12 0.05];
-dpos=[apos(3)/3+0.28 apos(2)-0.05 0.12 0.05];
-epos=[apos(3)/3+0.41 apos(2)-0.05 0.12 0.05];
-fpos=[apos(3)/3+0.54 apos(2)-0.05 0.12 0.05];
+cpos=[apos(3)/3+0.15 apos(2)-0.03 0.12 0.05];
+dpos=[apos(3)/3+0.28 apos(2)-0.03 0.12 0.05];
+e1pos=[apos(3)/3+0.41 apos(2)-0.03 0.12 0.05];
+f1pos=[apos(3)/3+0.54 apos(2)-0.03 0.12 0.05];
+f2pos=[apos(3)/3+0.54 apos(2)-0.09 0.12 0.05];
 
 
 
@@ -126,12 +127,16 @@ S = "leftright = get(gcbo,'value');";
 ui_d = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',dpos,...
               'value',leftright,'min',1,'max',-1,'callback',S); % Select to go left or right.
 
+S = "layers = layers_old; try set(layerplot,{'YData'},mat2cell([layers_old; layers_old(cl,:)],[ones(9,1)])); end;";
+ui_e1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Undo pick','Units','normalized','Position',e1pos,...
+              'callback',S); % Finish selection
+
 S = "layers_relto_surface = layers - surface_ind; layers_topo = layers_relto_surface + binshift; layers_topo_depth = tp.RefHeight - layers_topo * dz;geoinfo.num_layer = sum(max(~isnan(layers),[],2)); geoinfo.layers = layers; geoinfo.layers_relto_surface = layers_relto_surface; geoinfo.layers_topo = layers_topo; geoinfo.layers_topo_depth = layers_topo_depth; geoinfo.qualities = qualities; geoinfo.tp = tp; save(opt.filename_geoinfo, '-struct', 'geoinfo'); disp('Picks are saved.')";
-ui_e = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',epos,...
+ui_f1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',f1pos,...
               'callback',S); % Finish selection
 
 S = "set(ui_f, 'UserData', 0);";
-ui_f = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',fpos,...
+ui_f2 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',f2pos,...
               'Callback',S,'UserData', 1); % Finish selection
 
 
@@ -206,14 +211,14 @@ picks = cell(8, 1);
 
 iteration = 1;
 
-while get(ui_f, 'UserData')
+while get(ui_f2, 'UserData')
 if iteration == 1
     layerplot = plot(1:length(layers),layers,'k-x',1:length(layers(cl,:)),layers(cl,:),'b-x');
     disp('Move and zoom if needed. Press enter to start picking.')
     pan on;
     pause(); % you can zoom with your mouse and when your image is okay, you press any key
     pan off; % to escape the zoom mode
-    if ~get(ui_f, 'UserData')
+    if ~get(ui_f2, 'UserData')
         break
     end
     disp('Pick the first point. Only the last click is saved, confirm pick with enter.')
@@ -224,7 +229,7 @@ end
 
 [x,y,type]=ginput(); %gathers points until return
 
-if ~get(ui_f, 'UserData')
+if ~get(ui_f2, 'UserData')
     break
 end
 
@@ -255,18 +260,21 @@ elseif isempty(type_in)
     pan on;
     pause() % you can zoom with your mouse and when your image is okay, you press any key
     pan off; % to escape the zoom mode
-    if ~get(ui_f, 'UserData')
+    if ~get(ui_f2, 'UserData')
         break
     end
 else
     disp('Input type unknown. Only pick with left and right mouse buttons.')
 end
 
-layers(cl,:) = layer;
-qualities(cl,:) = quality;
-layers_relto_surface = layers - surface_ind;
-layers_topo = layers_relto_surface + binshift;
-layers_topo_depth = tp.RefHeight - layers_topo * dz;
+if ~isempty(type_in)
+    layers_old = layers;
+    layers(cl,:) = layer;
+    qualities(cl,:) = quality;
+    layers_relto_surface = layers - surface_ind;
+    layers_topo = layers_relto_surface + binshift;
+    layers_topo_depth = tp.RefHeight - layers_topo * dz;
+end
 % Plot updated layer
 try
     delete(layerplot);
