@@ -10,6 +10,7 @@ opt.output_folder = '\picked layers';
 opt.output_prefix = '\LayerData_';
 opt.create_new_geoinfo = 0; % 1 = yes, 0 = no. CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 opt.update_bottom = 0;      % 1 = yes, 0 = no. Update bottom, when old geoinfo is loaded.
+opt.update_seeds = 0;       % 1 = yes, 0 = no. This option can be used to update seeds only, if bottom is updated or a new geoinfo is created, the seeds will be computed in any case.
 opt.keep_old_picks = 1;     % 1 = yes, 0 = no. Keep old picks, when old geoinfo is loaded.
 opt.load_crossover = 0;     % 1 = yes, 0 = no
 opt.len_color_range = 100;

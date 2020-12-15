@@ -101,8 +101,11 @@ while update_plot
     end
 end
 
-if opt.update_bottom
-        minscales=3;
+if ~isfield(opt,'update_seeds')
+    opt.update_seeds = 0;
+end
+if opt.update_bottom || opt.update_seeds
+    minscales=3;
     scales = minscales:tp.maxwavelet; % definition from ARESELP
 
     %calculate seedpoints
