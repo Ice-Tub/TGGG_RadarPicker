@@ -122,8 +122,24 @@ if opt.update_bottom || opt.update_seeds
     if isfile(opt.filename_geoinfo) && opt.keep_old_picks
         geoinfo_old = load(opt.filename_geoinfo);
         geoinfo.num_layer = geoinfo_old.num_layer;
-        geoinfo.layers = geoinfo_old.layers;
-        geoinfo.qualities = geoinfo_old.qualities;
+        clms_old = geoinfo_old.tp.clms;
+        clms_new = tp.clms;
+        clms_old_min = max(1,clms_new(1)-clms_old(1)+1);
+        clms_old_max = min(length(clms_old),clms_new(end)-clms_old(1)+1);
+        clms_new_min = max(1,clms_old(1)-clms_new(1)+1);
+        clms_new_max = min(length(clms_new),clms_old(end)-clms_new(1)+1);
+        
+        geoinfo.layers = NaN(8,geoinfo.num_trace);
+        geoinfo.layers_relto_surface = NaN(8,geoinfo.num_trace);
+        geoinfo.layers_topo = NaN(8,geoinfo.num_trace);
+        geoinfo.layers_topo_depth = NaN(8,geoinfo.num_trace);
+        geoinfo.qualities = NaN(8,geoinfo.num_trace);
+
+        geoinfo.layers(:, clms_new_min:clms_new_max) = geoinfo_old.layers(:, clms_old_min:clms_old_max);
+        geoinfo.layers_relto_surface(:, clms_new_min:clms_new_max) = geoinfo_old.layers_relto_surface(:, clms_old_min:clms_old_max);
+        geoinfo.layers_topo(:, clms_new_min:clms_new_max) = geoinfo_old.layers_topo(:, clms_old_min:clms_old_max);
+        geoinfo.layers_topo_depth(:, clms_new_min:clms_new_max) = geoinfo_old.layers_topo_depth(:, clms_old_min:clms_old_max);
+        geoinfo.qualities(:, clms_new_min:clms_new_max) = geoinfo_old.qualities(:, clms_old_min:clms_old_max);
         clear geoinfo_old
     end
 

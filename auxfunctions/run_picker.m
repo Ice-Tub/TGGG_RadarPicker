@@ -1,15 +1,6 @@
 function run_picker(opt, tp)
 % RUN_PICKER executes the picking routine.
 
-%to fix next
-%optimize loop below
-%how to start & stop a layer?
-%automatically name layers by e.g. profile name and ind below surface pick
-%(&maybe by polar x and y)
-%automatically zoom into layer
-%automatically adjust color bar - by setting the maximum a certain color in
-
-% ToDo: to current collumns
 %%
     opt.filename_raw_data = append(pwd, opt.raw_folder, opt.raw_prefix, opt.input_section, '.mat'); % Don't needed if geoinfofile already exists.
     opt.filename_geoinfo = append(pwd, opt.output_folder, opt.output_prefix, opt.input_section, '.mat');
