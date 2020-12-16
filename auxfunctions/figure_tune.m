@@ -144,5 +144,5 @@ if opt.update_bottom || opt.update_seeds
     end
 
     geoinfo.tp = tp;
-    save(opt.filename_geoinfo, '-struct', 'geoinfo')
+    %save(opt.filename_geoinfo, '-struct', 'geoinfo')
 end
