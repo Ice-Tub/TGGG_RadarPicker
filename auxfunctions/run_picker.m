@@ -130,15 +130,17 @@ function run_picker(opt, tp)
                 %plot(P(geoinfo_idx,1),P(geoinfo_idx,2),'*r')
                 %figure(2)
                 if exist('geoinfo_co_idx', 'var')
-                    geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
-                    dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
+                    if isfield(geoinfo_co, 'layers')
+                        geoinfo_co_layers = geoinfo_co.layers(:,geoinfo_co_idx);
+                        dt=geoinfo_co.time_range(2)-geoinfo_co.time_range(1);%time step (for traces)
 
-                    geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
-                    geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
+                        geoinfo_co.time_pick_abs=geoinfo_co.traveltime_surface(geoinfo_co_idx)-geoinfo_co.time_range(1);
+                        geoinfo_co_layers_ind=geoinfo_co_layers-(geoinfo_co.time_pick_abs/dt); % gives 430 - 215 (surface pick)
 
-                    %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
-                    geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
-                    geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
+                        %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
+                        geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
+                        geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
+                    end
                 end
                 if any(cross_point_layers)
                     cross_point_idx = [cross_point_idx, geoinfo_idx];
