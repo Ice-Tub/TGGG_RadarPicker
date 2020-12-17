@@ -14,6 +14,9 @@ function run_picker(opt, tp)
                 filenames_cross = [filenames_cross; filename_cross];
             end
         else
+            if ischar(opt.cross_section)
+                opt.cross_section = {opt.cross_section};
+            end
             n_cross = numel(opt.cross_section);
             for k = 1:n_cross
                 filename_cross = append(pwd,opt.output_folder,opt.output_prefix,opt.cross_section{k},'.mat');
