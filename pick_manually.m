@@ -27,6 +27,7 @@ tp.bgSkip = 150; %default is 50 - makes a big difference for m-exh, higher is be
 tp.MinBinForSurfacePick = 10;% when already preselected, this can be small
 tp.smooth_sur=40; %between 30 and 60 seems to be good
 tp.MinBinForBottomPick = 1000;
+tp.MaxBinForBottomPick = 2000;
 tp.num_bottom_peaks = 5; % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.editing_window = 10; % Number of traces that are ubdated in editing mode.
 tp.smooth_bot=60; %smooth bottom pick, needs to be higher than surface pick, up to 200 ok

@@ -1,4 +1,4 @@
-function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
+function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick, MaxBottomPick)
 
     smooth2 = tp.smooth_bot;
     num_bottom_peaks = tp.num_bottom_peaks;
@@ -20,9 +20,9 @@ function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
     normalized_echogram = db_echogram - horizontal_mean;
 
     BottomInds = zeros(1,geoinfo.num_trace);
-    [~,BottomInds(1)] = max(normalized_echogram(MinBottomPick(1):end,1));
+    [~,BottomInds(1)] = max(normalized_echogram(MinBottomPick(1):MaxBottomPick,1));
     for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_echogram(MinBottomPick(n):end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
+        [~,Ind] = findpeaks(normalized_echogram(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',num_bottom_peaks);
         [~, pos] = min(abs(Ind-BottomInds(n-1)));
         BottomInds(n) = Ind(pos);
     end
