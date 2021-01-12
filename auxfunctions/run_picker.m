@@ -1,7 +1,9 @@
 function run_picker(opt, tp)
 % RUN_PICKER executes the picking routine.
-
+    
 %%
+    nol = 10; % number of layers
+
     opt.filename_raw_data = append(pwd, opt.raw_folder, opt.raw_prefix, opt.input_section, '.mat'); % Don't needed if geoinfofile already exists.
     opt.filename_geoinfo = append(pwd, opt.output_folder, opt.output_prefix, opt.input_section, '.mat');
     if opt.load_crossover
@@ -79,7 +81,7 @@ function run_picker(opt, tp)
                     'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
     cl = 1; % Set number of current layers    
-    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8'},'Units','normalized','Position',cpos,...
+    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10'},'Units','normalized','Position',cpos,...
                   'value',cl,'callback', @layer_callback); % Choose layer.
 
     leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
@@ -104,7 +106,7 @@ function run_picker(opt, tp)
     % need to load geoinfo3 manually
 
     cross_point_idx = NaN;
-    cross_point_layers = NaN(8,1);
+    cross_point_layers = NaN(nol,1);
     if opt.load_crossover
         for k = 1:n_cross
             geoinfo_co = load(filenames_cross{k}); % Loading the cross-over file
@@ -142,7 +144,9 @@ function run_picker(opt, tp)
 
                         %geoinfo.time_range(geoinfo3layer1_ind)-geoinfo3.traveltime_surface(1);
                         geoinfo.time_pick_abs=geoinfo.traveltime_surface(geoinfo_idx)-geoinfo_co.time_range(1);
-                        geoinfo_layers_ind=(geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind;
+                        geoinfo_layers_ind = NaN(nol,1);
+                        ncp = min(nol, length(geoinfo_co_layers_ind)); % number of exctracted cross points
+                        geoinfo_layers_ind(1:ncp) = (geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind(1:ncp);
                     end
                 end
                 if any(cross_point_layers)
@@ -160,16 +164,16 @@ function run_picker(opt, tp)
     co_plot = plot(cross_point_idx,cross_point_layers,'k*', cross_point_idx, cross_point_layers(cl,:),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
 
     %% Select starting point
-    % Make NaN matrix for 8 possible layers
+    % Make NaN matrix for 10 (nol) possible layers
     if isfield(geoinfo,'layers')
         layers = geoinfo.layers;
         qualities = geoinfo.qualities;
     else
-        layers = NaN(8,nx);
-        qualities = NaN(8,nx);
+        layers = NaN(nol,nx);
+        qualities = NaN(nol,nx);
     end
 
-    picks = cell(8, 1);
+    picks = cell(nol, 1);
 
     iteration = 1;
 
