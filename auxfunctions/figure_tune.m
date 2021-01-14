@@ -34,6 +34,7 @@ hold on
 update_plot = 1;
 manual_MBFBP = 0;
 MinBinBottom = ones(1,geoinfo.num_trace) * tp.MinBinForBottomPick;
+MaxBinBottom = ones(1,geoinfo.num_trace) * min(tp.MaxBinForBottomPick, length(tp.rows));
 dt=geoinfo.time_range(2)-geoinfo.time_range(1);
 t1=geoinfo.time_range(1);
 while update_plot
@@ -57,7 +58,7 @@ while update_plot
         %pick main reflectors (the bottom pick is very important for background
         %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
         geoinfo = pick_surface(geoinfo,geoinfo.echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
-        geoinfo = pick_bottom(geoinfo, tp, MinBinBottom);
+        geoinfo = pick_bottom(geoinfo, tp, MinBinBottom, MaxBinBottom);
     end
 
     % Lines for testting: delete if finished.
@@ -70,15 +71,19 @@ while update_plot
         delete(surplot);
         delete(minplot);
         delete(botplot);
+        delete(maxplot);
     end
 
-    MinBinBottomPlot=(MinBinBottom*dt)+t1;
+    MinBinBottomPlot = (MinBinBottom*dt)+t1;
+    MaxBinBottomPlot = (MaxBinBottom*dt)+t1;    
     % plot new surface and bottom pick
     surplot = plot(tp.clms,geoinfo.traveltime_surface,'Linewidth',2, 'Color', [0    0.4470    0.7410]);
     hold on
     minplot = plot(tp.clms,MinBinBottomPlot, 'k--');
     hold on
     botplot = plot(tp.clms,geoinfo.traveltime_bottom,'Linewidth',2, 'Color', [0.8500    0.3250    0.0980]);
+    hold on
+    maxplot = plot(tp.clms,MaxBinBottomPlot, 'k--');
     hold on
     %set(gcf,'doublebuffer','on');
 
