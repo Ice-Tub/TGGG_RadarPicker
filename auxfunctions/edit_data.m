@@ -1,5 +1,7 @@
 function edit_data(m_option, data_folder, mf_file, mfl, mt_file, mtl)
 %%
+% ToDo: Include option 'append'
+%%
 
 if ~contains(mf_file, '.mat')
     mf_file = append(mf_file, '.mat');
@@ -35,6 +37,8 @@ elseif isequal(m_option, 'swap')
     else
         disp("The 'swap'-option only works, if move_from_file and move_to_file are equal.")
     end
+elseif isequal(m_option, 'view')
+    disp(append('You can now view file ', mt_file,'.'))
 else
     option_alert = append("move_option '", m_option, "' is not known.");
     disp(option_alert)

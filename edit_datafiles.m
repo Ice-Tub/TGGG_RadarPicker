@@ -3,11 +3,11 @@ close all;
 addpath(append(pwd,'\auxfunctions'))
 
 % Settings
-move_option = 'swap' ; % Options: 'overwrite' or 'swap'
+move_option = 'view' ; % Options: 'swap', 'overwrite' or 'view'
 data_folder = 'picked layers';
-move_from_file = 'LayerData_009';
-move_from_layer = 2;
-move_to_file = 'LayerData_009';
-move_to_layer = 3;
+move_from_file = 'LayerData_06_02_002';
+move_from_layer = 9;
+move_to_file = 'LayerData_06_02_002';
+move_to_layer = 1;
 
-edit_data(move_option, data_folder, move_from_file, move_from_layer, move_to_file, move_to_layer)
+edit_data(move_option, data_folder, move_from_file, move_from_layer, move_to_file, move_to_layer);
