@@ -79,7 +79,8 @@ disp('Press "Save changes" to write changes to file.')
 
 
     function save_callback(~, ~)
-    save(mt_file, '-struct', 'mt_geoinfo');
+    save(mt_filepath, '-struct', 'mt_geoinfo');
+    disp('Changes were saved.')
     end
 
     
