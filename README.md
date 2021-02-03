@@ -1,34 +1,60 @@
 # picking_isochrones
 
-To pick layers in airborne radar data you need to run 'pick_manually.m'.
+To pick layers in airborne radar data you need to run 'pick_manually.m', in which you can also set the options for the picking.
 
+%%% Input
 Data:
-
-The raw_data needs to be placed in a folder called 'raw_data', placed in the same directory as picking_isochrones.
-Here, a folder 'pick_data' will also be created by the programm, where the radar_data in connection with the picked layers is saved.
+First, you can specify the folder directories and prefixes for the names of the raw data and the output data files.
+Subsecuently, you can set by 'input_section' the number of the radargram that you want to work on.
+With 'cross_section' you can select radargrams from which you want to find the cross-over points (if activated, see below). Specify them either as a list, e.g. {'006'; '009'} (note the curly brackets), or by selecting 'all' radargrams in the 'output_folder' (without brackets).
 
 Options:
+The following options can be activated by setting their value to 1 and deacitvate by setting it to 0.
 
-create_new_geoinfo: If a file with the stated output-name (filename_geoinfo) already exists, this option can be activated to force the creation of a new output-file.
+'create_new_geoinfo': If a file with the stated output-name ('output_prefix' + 'input_section') already exists, this option can be activated to force the creation of a new output-file. Otherwise work will be continued on the existing file.
 
-keep_old_picks: If a new output-file is created, while a old file exists, picks of the old file can be transferred with this option. Note: Until now, this does not correct the position of the picks, if the limits of the radargram are changed.
+'update_bottom': With this option the update of the bottom pick can be forced in an existing file. If a new file is created, a new bottom will be created in any case and this option is obsolete.
 
-load_crossover: If another outputfile with picked layers already exists, you can activate this option to find cross-points.
+'update_seeds': This option can be used to force the computation of new seeds. Needed, if you want to change some of the corresponding tuning parameter (see below) afterwards. If a new geoinfo is created or the bottom is updated, new seeds will be computed anyway.
 
-Figure 2:
+keep_old_picks: If a new output-file is created with 'create_new_geoinfo', while a old file exists, picks of the old file can be transferred with this option.
 
-You can pick in figure 2. Therefore, 3 input-types are used: left-click, right-click and enter. With clicking, the layers can be changed. Each click needs to be confirmed by pressing enter. Additionally, you can switch between picking mode and move-/zoom-mode, by pushing enter (If no click was made). 
+load_crossover: If this option is activated, cross-over points will be determined, as selected in 'cross_section'.
 
-With the first left-click, a layer is traced to both directions starting from the click-position.
+With 'len_color_range' and 'cmp' you can set the color range and the colormap of the picker.
 
-Afterwards you can left-click to force the layer to a specific point and trace it from there onwards.
+Tuning parameters:
+This section contains options that affect the appearance of the processed radargram (e.g. how the seeds are computed). They are stored in the geoinfo under geoinfo.tp. If you load a previously created geoinfo, all tuning parameters, but 'clms', 'rows' and 'num_bottom_peaks' are overwritten, with the current settings.
+
+%%% Processing-figures
+Figure 1: Surface and bottom pick
+This figure shows the surface and bottom pick. If 'create_new_geoinfo'=1 or 'update_bottom'=1, a pop-up window appears, which allows, to update the bottom-pick, which crucially affects the computation of seeds. The bottom pick is processed iteratively. Starting from the strongest return signal on the left side, the bottom pick of the next row is selected as the signal peak, which is closest to the row of the previous bottom pick, whereat always the 'num_bottom_peaks' strongest peaks in each row are considered. Depending on the dominance of the bottom pick the parameter 'num_bottom_peaks' can hence be used to tune the picker, such that it not looses the bottom signal.
+
+In case that no strong bottom signal exists in certain lines, the bottom-picker will loose track and produce strong outliers. With activating the second option of the pop-up window ('pick MinBinForBottomPick manually'), a manual picker is started after pressing ok. This manual picker tracks all clicks and converges them into a variable 'MinBinForBottomPick', which can be used to cut off outliers.
+
+When you are happy with your bottom-pick you can press 'Cancel' to continue.
+
+
+Figure 2: Layer picker
+This figure initially shows the radargram in the background and the seeds. Here, you can pick your layers. Therefore, 3 input-types are used: left-click, right-click and enter. With clicking, the layers can be changed. Each click needs to be confirmed by pressing enter. Additionally, you can switch between picking mode and move-/zoom-mode, by pushing enter (If no click was made). 
+
+With the first left-click, a layer is traced to both directions starting from the click-position. Afterwards you can left-click to force the layer to a specific point and trace it from there onwards.
 
 With a right-click you can delete all points in the layer on the right side of the click position. To creat a gap in the layer, you can use this to cut it off and start it over again with another left-click.
 
-If the option 'Go left' is activated, you can do the same as above, just in the other direction.
+If the option 'Go left' is active, you can do the same as above, just in the other direction.
+If the option 'Edit mode' is active, not all, but only the next 'tp.editing_window' points are traced or deleted.
 
-If you misclick and overwrite or delete you previously picked layer. Don't panick (if you have saved it)! You can break the programm (STRG+C) and run it again (with create_new_geoinfo = 0) and your previous picks will be loaded. Don't press 'Save picks' or 'End picking' and everything is fine. 
+If you misclick and overwrite or delete you previously picked layer, you can undo your last pick by pressing 'Undo pick'. Caution: this option has no long-term memory and can only undo the very last action. However, if you realize your mistake too late, you can still restore any saved changes by breaking the programm (STRG+C) and running it again (with create_new_geoinfo = 0).
 
-The picker can save up to 8 different layers, between which you can switch by selecting {Layer1,...,Layer8}. Picks of the active layer are shown in blue, picks of other layers in black.
+The picker can save up to 10 different layers, between which you can switch by selecting {Layer1,...,Layer10}. Picks of the active layer are shown in blue, picks of other layers in black.
+
 You can save the current picks by pressing 'Save picks'.
-You can finish picking by pressing 'End picking' (This does not work smooth. To finally leave the picking-loop, you need to click on the radargram an press enter).
+You can finish picking by pressing 'End picking', this will also save you current picks. (This does not work smooth. To finally leave the picking-loop, you need to click on the radargram an press enter).
+
+
+# Editing data files from pick
+
+To conduct some simple corrections of your data files, you can run 'edit_datafiles.m'.
+
+This script can be used to 'swap' two layers, to 'overwrite' one layer with another (from the same or from a different file) or to simply 'view' a pick file.
