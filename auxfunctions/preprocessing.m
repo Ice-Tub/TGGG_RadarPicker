@@ -1,4 +1,4 @@
-function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
+efunction [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
 %--------------------------------------------------------------
 % Calcuate echogram in dB units and the row numbers of surface and bottom layers
 %
@@ -30,17 +30,17 @@ function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
 % [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,echogram)
 %---------------------------------------------------------------
 
-    if nargin < 3
-        trimrows = 300; %trimrows = 300, 0 for pre-icebridge
+    if nargin < 2
+        trimrows = 0; %trimrows = 300, 0 for pre-icebridge  
     end
     % convert the format of the echogram
-    if sum(geoinfo.echogram(:)) < 0
+    if sum(geoinfo.data(:)) < 0
         % pre *** the MCoRDS data has already converted to dB
         imDat = [];
-        imAmp = geoinfo.echogram;
+        imAmp = geoinfo.data;
     else
-        imDat = geoinfo.echogram;
-        imAmp = 10*log10(geoinfo.echogram);
+        imDat = geoinfo.data;
+        imAmp = 10*log10(geoinfo.data);
     end
     % trim the bottom weird area of the echogram
     imAmp(size(imAmp,1) - trimrows + 1:end,:) = [];
@@ -49,7 +49,7 @@ function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
     %% Extract the surface and bottom layers
     Surface = geoinfo.traveltime_surface;
     Bottom = geoinfo.traveltime_bottom;
-    Time = geoinfo.time_range;
+    Time = geoinfo.twt;
     ysrf = zeros(size(Surface)); % row number of Surface along track
     ybtm = zeros(size(Bottom));  % row number of Bottom along track
 

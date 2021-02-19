@@ -1,4 +1,8 @@
+<<<<<<< Updated upstream
 function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
+=======
+function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
+>>>>>>> Stashed changes
 
     smooth2 = tp.smooth_bot;
     num_bottom_peaks = tp.num_bottom_peaks;
@@ -14,15 +18,25 @@ function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
     %if nargin < 4
     %    num_bottom_peak = 5;
     %end
-
-    db_echogram = mag2db(geoinfo.echogram);
-    horizontal_mean = mean(db_echogram,2);
-    normalized_echogram = db_echogram - horizontal_mean;
+    
+    if strcmpi(opt.input_type, 'MCoRDS')
+        db_data = mag2db(geoinfo.data);
+    elseif strcmpi(opt.input_type, 'GPR_LF')
+        db_data = geoinfo.data;
+    end
+    horizontal_mean = mean(db_data,2);
+    normalized_data = db_data - horizontal_mean;
 
     BottomInds = zeros(1,geoinfo.num_trace);
+<<<<<<< Updated upstream
     [~,BottomInds(1)] = max(normalized_echogram(MinBinForBottomPick:end,1));
     for n=2:geoinfo.num_trace
         [~,Ind] = findpeaks(normalized_echogram(MinBinForBottomPick:end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
+=======
+    [~,BottomInds(1)] = max(normalized_data(MinBottomPick(1):MaxBottomPick,1));
+    for n=2:geoinfo.num_trace
+        [~,Ind] = findpeaks(normalized_data(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',num_bottom_peaks);
+>>>>>>> Stashed changes
         [~, pos] = min(abs(Ind-BottomInds(n-1)));
         BottomInds(n) = Ind(pos);
     end
@@ -36,8 +50,8 @@ function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
     %FirstArrivalInds = floor(movmean(FirstArrivalInds,smooth2));
     BottomInds = BottomInds+MinBinForBottomPick;
 
-    dt=geoinfo.time_range(2)-geoinfo.time_range(1);
-    t1=geoinfo.time_range(1);
+    dt=geoinfo.twt(2)-geoinfo.twt(1);
+    t1=geoinfo.twt(1);
     Bottom_pick_time=(BottomInds*dt)+t1;
     geoinfo.traveltime_bottom=Bottom_pick_time;
 end

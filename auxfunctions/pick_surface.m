@@ -12,8 +12,8 @@ function [geoinfo] = pick_surface(geoinfo,echogram,MinBinForSurfacePick,smooth)
  FirstArrivalInds = floor(movmean(FirstArrivalInds,smooth));
  FirstArrivalInds = FirstArrivalInds+MinBinForSurfacePick;
  
- dt=geoinfo.time_range(2)-geoinfo.time_range(1);
- t1=geoinfo.time_range(1);
+ dt=geoinfo.twt(2)-geoinfo.twt(1);
+ t1=geoinfo.twt(1);
  Surface_pick_time=(FirstArrivalInds*dt)+t1;
  geoinfo.traveltime_surface=Surface_pick_time;
 end

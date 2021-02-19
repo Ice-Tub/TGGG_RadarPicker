@@ -1,12 +1,22 @@
+<<<<<<< Updated upstream
 function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,leftright)
+=======
+function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_in,leftright,editing_mode)
+>>>>>>> Stashed changes
 %propagate_layer automatically propagates a radar layer
 %   Detailed explanation goes here
     lmid = round(window/2);
 
     x_trace = x_in;
     
+<<<<<<< Updated upstream
     nx = size(geoinfo.echogram, 2);
     while ismember(x_trace, 1:nx)
+=======
+    nx = size(geoinfo.data, 2);
+    continue_loop = 1;
+    while continue_loop
+>>>>>>> Stashed changes
         if x_trace == x_in
             %disp('Pick.')
             y_trace = y_in;
@@ -25,7 +35,16 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_i
                 quality(x_trace)=3;
             end
         else
-            [~,lind,~,p] = findpeaks(mag2db(geoinfo.echogram(current_window,x_trace))); %need to do this on the bare data.
+            if strcmpi(opt.input_type, 'MCoRDS')
+                [~,lind,~,p] = findpeaks(mag2db(geoinfo.data(current_window,x_trace))); %need to do this on the bare data.
+            elseif strcmpi(opt.input_type, 'GPR_LF')
+                [lind,p] = islocalmin(geoinfo.data(current_window,x_trace));
+                lind = find(lind);
+                [~,p] = find(p);
+                if isempty(lind)
+                    [~,lind,~,p] = findpeaks(geoinfo.data(current_window,x_trace)); %need to do this on the bare data. 
+                end
+            end
             if length(lind)==1
                 %disp('One peak')
                 y_trace = current_window(lind);
@@ -45,9 +64,23 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_i
         end
         layer(x_trace) = y_trace;
 
+<<<<<<< Updated upstream
         current_window=ceil(y_trace-window/2):floor(y_trace+window/2);
 
         x_trace = x_trace + leftright; %moves along the traces progressively, according to selected direction
+=======
+        current_window = ceil(y_trace-tp.window/2):floor(y_trace+tp.window/2);
+
+        x_trace = x_trace + leftright; %moves along the traces progressively, according to selected direction
+        
+        if editing_mode
+            edit_min = max(1, x_in-opt.editing_window);
+            edit_max = min(nx, x_in+opt.editing_window);
+            continue_loop = ismember(x_trace, edit_min:edit_max);
+        else
+            continue_loop = ismember(x_trace, 1:nx);
+        end
+>>>>>>> Stashed changes
     end
 end
 
