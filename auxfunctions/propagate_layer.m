@@ -1,22 +1,13 @@
-<<<<<<< Updated upstream
-function [layer,quality] = propagate_layer(layer,quality,geoinfo,window,x_in,y_in,leftright)
-=======
 function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_in,leftright,editing_mode)
->>>>>>> Stashed changes
 %propagate_layer automatically propagates a radar layer
 %   Detailed explanation goes here
     lmid = round(window/2);
 
     x_trace = x_in;
     
-<<<<<<< Updated upstream
-    nx = size(geoinfo.echogram, 2);
-    while ismember(x_trace, 1:nx)
-=======
     nx = size(geoinfo.data, 2);
     continue_loop = 1;
     while continue_loop
->>>>>>> Stashed changes
         if x_trace == x_in
             %disp('Pick.')
             y_trace = y_in;
@@ -64,11 +55,6 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
         end
         layer(x_trace) = y_trace;
 
-<<<<<<< Updated upstream
-        current_window=ceil(y_trace-window/2):floor(y_trace+window/2);
-
-        x_trace = x_trace + leftright; %moves along the traces progressively, according to selected direction
-=======
         current_window = ceil(y_trace-tp.window/2):floor(y_trace+tp.window/2);
 
         x_trace = x_trace + leftright; %moves along the traces progressively, according to selected direction
@@ -80,7 +66,6 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
         else
             continue_loop = ismember(x_trace, 1:nx);
         end
->>>>>>> Stashed changes
     end
 end
 

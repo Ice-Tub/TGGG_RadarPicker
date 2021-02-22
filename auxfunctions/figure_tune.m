@@ -8,6 +8,7 @@ function [geoinfo, tp] = figure_tune(tp,opt)
 %
 %    presettings_ok = 1;
 %end
+nol = 10;
 
 if opt.create_new_geoinfo
     geoinfo = readdata(opt.filename_input_data,opt.input_type,tp.rows,tp.clms);
@@ -17,8 +18,6 @@ elseif ~isfile(opt.filename_geoinfo)
     opt.update_bottom = 1;
 else
     geoinfo = load(opt.filename_geoinfo);
-<<<<<<< Updated upstream
-=======
     nt = geoinfo.num_trace;
     layers = NaN(nol,nt);
     qualities = NaN(nol,nt);
@@ -43,7 +42,6 @@ else
     geoinfo.layers_topo = layers_topo;
     geoinfo.layers_topo_depth = layers_topo_depth;    
     
->>>>>>> Stashed changes
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
     tp.rows = geoinfo.tp.rows;
     tp.clms = geoinfo.tp.clms;
@@ -67,14 +65,9 @@ hold on
 update_plot = 1;
 manual_MBFBP = 0;
 MinBinBottom = ones(1,geoinfo.num_trace) * tp.MinBinForBottomPick;
-<<<<<<< Updated upstream
-dt=geoinfo.time_range(2)-geoinfo.time_range(1);
-t1=geoinfo.time_range(1);
-=======
 MaxBinBottom = ones(1,geoinfo.num_trace) * min(tp.MaxBinForBottomPick, length(tp.rows));
 dt=geoinfo.twt(2)-geoinfo.twt(1);
 t1=geoinfo.twt(1);
->>>>>>> Stashed changes
 while update_plot
     if manual_MBFBP
         disp('Pick a variable MinBinForBottomPick.')
@@ -95,13 +88,8 @@ while update_plot
     if opt.update_bottom
         %pick main reflectors (the bottom pick is very important for background
         %noise associated with mexh wavelet (morl can handle more noise but give less accurate results)
-<<<<<<< Updated upstream
-        geoinfo = pick_surface(geoinfo,geoinfo.echogram,tp.MinBinForSurfacePick,tp.smooth_sur);
-        geoinfo = pick_bottom(geoinfo, tp, MinBinBottom);
-=======
         geoinfo = pick_surface(geoinfo,geoinfo.data,tp.MinBinForSurfacePick,tp.smooth_sur);
         geoinfo = pick_bottom(geoinfo, tp, opt, MinBinBottom, MaxBinBottom);
->>>>>>> Stashed changes
     end
 
     % Lines for testting: delete if finished.
@@ -145,26 +133,9 @@ while update_plot
     end
 end
 
-<<<<<<< Updated upstream
-if opt.update_bottom
-        minscales=3;
-    scales = minscales:tp.maxwavelet; % definition from ARESELP
-
-    %calculate seedpoints
-    [~,imAmp, ysrf,ybtm] = preprocessing(geoinfo);
-    peakim = peakimcwt(imAmp,scales,tp.wavelet,ysrf,ybtm,tp.bgSkip); % from ARESELP
-    geoinfo.peakim = peakim;
-    geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
-
-    clear peakim imAmp ysrf ybtm echogram scales
-
-
-    [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.latitude,geoinfo.longitude); %convert to polar stereographic
-=======
 if ~isfield(opt,'update_seeds')
     opt.update_seeds = 0;
 end
->>>>>>> Stashed changes
 
 if opt.update_bottom || opt.update_seeds
     if strcmpi(opt.input_type, 'MCoRDS')
@@ -185,10 +156,6 @@ if opt.update_bottom || opt.update_seeds
     if isfile(opt.filename_geoinfo) && opt.keep_old_picks
         geoinfo_old = load(opt.filename_geoinfo);
         geoinfo.num_layer = geoinfo_old.num_layer;
-<<<<<<< Updated upstream
-        geoinfo.layers = geoinfo_old.layers;
-        geoinfo.qualities = geoinfo_old.qualities;
-=======
         clms_old = geoinfo_old.tp.clms;
         clms_new = tp.clms;
         clms_old_min = max(1,clms_new(1)-clms_old(1)+1);
@@ -211,7 +178,6 @@ if opt.update_bottom || opt.update_seeds
             geoinfo.layers_topo_depth(1:nool, clms_new_min:clms_new_max) = geoinfo_old.layers_topo_depth(:, clms_old_min:clms_old_max);
             geoinfo.qualities(1:nool, clms_new_min:clms_new_max) = geoinfo_old.qualities(:, clms_old_min:clms_old_max);
         end
->>>>>>> Stashed changes
         clear geoinfo_old
     end
     geoinfo.tp = tp;

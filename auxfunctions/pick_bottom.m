@@ -1,8 +1,4 @@
-<<<<<<< Updated upstream
-function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick)
-=======
 function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
->>>>>>> Stashed changes
 
     smooth2 = tp.smooth_bot;
     num_bottom_peaks = tp.num_bottom_peaks;
@@ -28,15 +24,9 @@ function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
     normalized_data = db_data - horizontal_mean;
 
     BottomInds = zeros(1,geoinfo.num_trace);
-<<<<<<< Updated upstream
-    [~,BottomInds(1)] = max(normalized_echogram(MinBinForBottomPick:end,1));
-    for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_echogram(MinBinForBottomPick:end,n),'SortStr','descend','NPeaks',num_bottom_peaks);
-=======
     [~,BottomInds(1)] = max(normalized_data(MinBottomPick(1):MaxBottomPick,1));
     for n=2:geoinfo.num_trace
         [~,Ind] = findpeaks(normalized_data(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',num_bottom_peaks);
->>>>>>> Stashed changes
         [~, pos] = min(abs(Ind-BottomInds(n-1)));
         BottomInds(n) = Ind(pos);
     end

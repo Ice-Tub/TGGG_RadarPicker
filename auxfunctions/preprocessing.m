@@ -1,4 +1,4 @@
-efunction [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
+function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
 %--------------------------------------------------------------
 % Calcuate echogram in dB units and the row numbers of surface and bottom layers
 %
