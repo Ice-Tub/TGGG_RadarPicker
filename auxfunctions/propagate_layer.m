@@ -1,7 +1,7 @@
 function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_in,leftright,editing_mode)
 %propagate_layer automatically propagates a radar layer
 %   Detailed explanation goes here
-    lmid = round(window/2);
+    lmid = round(tp.window/2);
 
     x_trace = x_in;
     
@@ -42,7 +42,7 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
                 quality(x_trace)=4;
             elseif length(lind)>1
                 %disp('***largest & closest peak.')     
-                wdist = 1-abs(2*(lind - lmid)/(window-1));%zwischen 0 und 1, with 1 being closer, so it will have more weight in next step
+                wdist = 1-abs(2*(lind - lmid)/(tp.window-1));%zwischen 0 und 1, with 1 being closer, so it will have more weight in next step
                 lprobability = wdist+p/mean(p); %not perfect, but gives a tool to weigh proximity relativ to brightness 
                 [~, indprob] = max(lprobability);
                 y_trace = current_window(lind(indprob));
