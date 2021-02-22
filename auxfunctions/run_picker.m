@@ -272,7 +272,11 @@ function run_picker(opt, tp)
     layers_relto_surface = layers - surface_ind;
     layers_topo = layers_relto_surface + binshift;
     layers_topo_depth = tp.RefHeight - layers_topo * dz;
-
+    
+    if isfield(geoinfo,'data_org')
+        geoinfo.data = geoinfo.data_org;
+        geoinfo = rmfield(geoinfo,'data_org');
+    end
     geoinfo.num_layer = sum(max(~isnan(layers),[],2));
     geoinfo.layers = layers;
     geoinfo.layers_relto_surface = layers_relto_surface;
@@ -319,18 +323,27 @@ function run_picker(opt, tp)
 
 
     function save_callback(~, ~)
-       layers_relto_surface = layers - surface_ind;
-       layers_topo = layers_relto_surface + binshift;
-       layers_topo_depth = tp.RefHeight - layers_topo * dz;
-       geoinfo.num_layer = sum(max(~isnan(layers),[],2));
-       geoinfo.layers = layers;
-       geoinfo.layers_relto_surface = layers_relto_surface;
-       geoinfo.layers_topo = layers_topo;
-       geoinfo.layers_topo_depth = layers_topo_depth;
-       geoinfo.qualities = qualities;
-       geoinfo.tp = tp;
-       save(opt.filename_geoinfo, '-struct', 'geoinfo');
-       disp('Picks are saved.');
+        if isfield(geoinfo,'data_org')
+            geoinfo.data = geoinfo.data_org;
+            geoinfo = rmfield(geoinfo,'data_org');
+        end
+
+        layers_relto_surface = layers - surface_ind;
+        layers_topo = layers_relto_surface + binshift;
+        layers_topo_depth = tp.RefHeight - layers_topo * dz;
+        geoinfo.num_layer = sum(max(~isnan(layers),[],2));
+        geoinfo.layers = layers;
+        geoinfo.layers_relto_surface = layers_relto_surface;
+        geoinfo.layers_topo = layers_topo;
+        geoinfo.layers_topo_depth = layers_topo_depth;
+        geoinfo.qualities = qualities;
+        geoinfo.tp = tp;
+        save(opt.filename_geoinfo, '-struct', 'geoinfo');
+        disp('Picks are saved.');
+        
+        geoinfo.data_org = geoinfo.data;
+        data_mean = mean(geoinfo.data_org,2);
+        geoinfo.data = geoinfo.data_org-data_mean;
     end
 
 

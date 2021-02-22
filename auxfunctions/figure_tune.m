@@ -18,6 +18,7 @@ elseif ~isfile(opt.filename_geoinfo)
     opt.update_bottom = 1;
 else
     geoinfo = load(opt.filename_geoinfo);
+    
     nt = geoinfo.num_trace;
     layers = NaN(nol,nt);
     qualities = NaN(nol,nt);
@@ -48,6 +49,12 @@ else
     tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks;
 end
 
+if opt.delete_stripes
+    geoinfo.data_org = geoinfo.data;
+    data_mean = mean(geoinfo.data_org,2);
+    geoinfo.data = geoinfo.data_org-data_mean;
+end
+    
 % Create background plot.
 f1 = figure(1);
 
@@ -181,5 +188,5 @@ if opt.update_bottom || opt.update_seeds
         clear geoinfo_old
     end
     geoinfo.tp = tp;
-    save(opt.filename_geoinfo, '-struct', 'geoinfo')
+    %save(opt.filename_geoinfo, '-struct', 'geoinfo')
 end
