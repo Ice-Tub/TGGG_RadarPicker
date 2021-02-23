@@ -38,7 +38,7 @@ function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
     %plot(1:length(horizontal_min),horizontal_min)
 
     %FirstArrivalInds = floor(movmean(FirstArrivalInds,smooth2));
-    BottomInds = BottomInds+MinBinForBottomPick;
+    BottomInds = BottomInds+MinBottomPick;
 
     dt=geoinfo.twt(2)-geoinfo.twt(1);
     t1=geoinfo.twt(1);
