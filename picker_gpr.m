@@ -14,7 +14,7 @@ opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or 
 % The following options can be activated by setting: 1 = yes, 0 = no.
 opt.create_new_geoinfo = 0; % CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 opt.update_bottom = 0;      % Update bottom, when old geoinfo is loaded.
-opt.update_seeds = 1;       % This option can be used to update seeds only, if bottom is updated or a new geoinfo is created, the seeds will be computed in any case.
+opt.update_seeds = 1;       % This option can be used to aupdate seeds only, if bottom is updated or a new geoinfo is created, the seeds will be computed in any case.
 opt.keep_old_picks = 1;     % Keep old picks, when old geoinfo is loaded.
 opt.load_crossover = 1;     % Activate loading cross-over points.
 opt.delete_stripes = 0;     % If activated, the horizontal mean will be subtracted from data.

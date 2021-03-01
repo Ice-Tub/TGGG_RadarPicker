@@ -31,8 +31,10 @@ function run_picker(opt, tp)
     % Activate to save geoinfo after preprocessing:
     %save(opt.filename_geoinfo, '-struct', 'geoinfo')
 %% Layer picking
-    figure_pick(geoinfo, tp, opt);
+    geoinfo = figure_pick(geoinfo, tp, opt);
 
+    save_picks(geoinfo,tp,opt) % Saving the geoinfo with picks
+    disp('Picking finished. Your picks have been saved.')
 end
 
 
