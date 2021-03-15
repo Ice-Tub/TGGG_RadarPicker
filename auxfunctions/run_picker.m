@@ -24,7 +24,7 @@ function run_picker(opt, tp)
         [geoinfo, opt] = compute_seeds(geoinfo,tp,opt);
         
         if isfile(opt.filename_geoinfo) && opt.keep_old_picks
-            [geoinfo] = load_old_layers(geoinfo,opt);
+            geoinfo = load_old_layers(geoinfo,opt);
         end
     end
     
