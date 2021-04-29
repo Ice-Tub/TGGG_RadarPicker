@@ -47,8 +47,8 @@ function [imDat,imAmp, ysrf,ybtm] = preprocessing(geoinfo,trimrows)
     if ~isempty(imDat), imDat(size(imDat,1) - trimrows + 1:end,:) = [];end
 %-------------------------------------------------    
     %% Extract the surface and bottom layers
-    Surface = geoinfo.traveltime_surface;
-    Bottom = geoinfo.traveltime_bottom;
+    Surface = geoinfo.twt_sur;
+    Bottom = geoinfo.twt_bot;
     Time = geoinfo.twt;
     ysrf = zeros(size(Surface)); % row number of Surface along track
     ybtm = zeros(size(Bottom));  % row number of Bottom along track
