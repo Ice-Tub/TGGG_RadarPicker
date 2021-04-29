@@ -24,7 +24,8 @@ load_crossover: If this option is activated, cross-over points will be determine
 With 'len_color_range' and 'cmp' you can set the color range and the colormap of the picker.
 
 Tuning parameters:
-This section contains options that affect the appearance of the processed radargram (e.g. how the seeds are computed). They are stored in the geoinfo under geoinfo.tp. If you load a previously created geoinfo, all tuning parameters, but 'clms', 'rows' and 'num_bottom_peaks' are overwritten, with the current settings.
+This section contains options that affect the appearance of the processed radargram (e.g. how the seeds are computed). They are stored in the geoinfo under geoinfo.tp. If you load a previously created geoinfo, all tuning parameters, but 'clms', 'rows' and 'num_bottom_peaks' are overwritten, with your current selected settings.
+Note: 'clms' can either be a range (e.g.: 1:500) or it can be set to 'full' so that the full range of the loaded radargram is selected.
 
 %%% Processing-figures
 Figure 1: Surface and bottom pick

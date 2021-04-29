@@ -4,9 +4,15 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
 
     if opt.create_new_geoinfo
         geoinfo = readdata(opt.filename_input_data,opt.input_type,tp.rows,tp.clms);
+        if tp.clms == 'full'
+            tp.clms = 1:size(geoinfo.data,2);
+        end
         opt.update_bottom = 1;
     elseif ~isfile(opt.filename_geoinfo)
         geoinfo = readdata(opt.filename_input_data,opt.input_type,tp.rows,tp.clms);
+        if tp.clms == 'full'
+            tp.clms = 1:size(geoinfo.data,2);
+        end
         opt.update_bottom = 1;
     else
         geoinfo = load(opt.filename_geoinfo);
