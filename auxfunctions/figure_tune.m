@@ -55,6 +55,7 @@ while update_plot
     end
 
     MinBinBottomPlot=(MinBinBottom*dt)+t1;
+    MaxBinBottomPlot=(MaxBinBottom*dt)+t1;
     % plot new surface and bottom pick
     surplot = plot(tp.clms,geoinfo.twt_sur,'Linewidth',2, 'Color', [0    0.4470    0.7410]);
     hold on
