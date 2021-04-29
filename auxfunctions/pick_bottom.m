@@ -1,43 +1,24 @@
-function [geoinfo] = pick_bottom(geoinfo,tp, MinBottomPick, MaxBottomPick)
-
-    smooth2 = tp.smooth_bot;
-    num_bottom_peaks = tp.num_bottom_peaks;
-
-    %if nargin < 2
-    %    MinBinForBottomPick =   1500;
-    %end
-
-    %if nargin < 3
-    %smooth2 =   200;
-    %end
-
-    %if nargin < 4
-    %    num_bottom_peak = 5;
-    %end
-
-    db_echogram = mag2db(geoinfo.echogram);
-    horizontal_mean = mean(db_echogram,2);
-    normalized_echogram = db_echogram - horizontal_mean;
+function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
+    
+    if strcmpi(opt.input_type, 'MCoRDS')
+        data_scaled = mag2db(geoinfo.data);
+    elseif strcmpi(opt.input_type, 'GPR_LF')
+        data_scaled = geoinfo.data;
+    end
+    
+    horizontal_mean = mean(data_scaled,2);
+    normalized_data = data_scaled - horizontal_mean;
 
     BottomInds = zeros(1,geoinfo.num_trace);
-    [~,BottomInds(1)] = max(normalized_echogram(MinBottomPick(1):MaxBottomPick,1));
+    [~,BottomInds(1)] = max(normalized_data(MinBottomPick(1):MaxBottomPick,1));
     for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_echogram(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',num_bottom_peaks);
+        [~,Ind] = findpeaks(normalized_data(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',tp.num_bottom_peaks);
         [~, pos] = min(abs(Ind-BottomInds(n-1)));
         BottomInds(n) = Ind(pos);
     end
 
-    %[~,FirstArrivalInds] = max(normalized_echogram(MinBinForBottomPick:end,:));
-    %figure(4)
-    %imagesc(normalized_echogram)
-    %figure(5)
-    %plot(1:length(horizontal_min),horizontal_min)
-
-    %FirstArrivalInds = floor(movmean(FirstArrivalInds,smooth2));
-    BottomInds = BottomInds+MinBottomPick;
-
-    dt=geoinfo.time_range(2)-geoinfo.time_range(1);
-    t1=geoinfo.time_range(1);
-    Bottom_pick_time=(BottomInds*dt)+t1;
-    geoinfo.traveltime_bottom=Bottom_pick_time;
+    BottomInds = floor(movmean(BottomInds,tp.smooth_bot));
+    BottomInds = BottomInds + MinBottomPick;
+    
+    geoinfo.twt_bot = ind2twt(geoinfo,BottomInds);
 end

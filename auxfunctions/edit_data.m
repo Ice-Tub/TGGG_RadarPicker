@@ -39,41 +39,94 @@ elseif isequal(m_option, 'swap')
     end
 elseif isequal(m_option, 'view')
     disp(append('You can now view file ', mt_file,'.'))
+elseif isequal(m_option, 'update')
+    if isfield(mt_geoinfo,'echogram')
+        mt_geoinfo.data = mt_geoinfo.echogram;
+        mt_geoinfo = rmfield(mt_geoinfo,'echogram');
+    end
+    if isfield(mt_geoinfo,'time_range')
+        mt_geoinfo.twt = mt_geoinfo.time_range;
+        mt_geoinfo = rmfield(mt_geoinfo,'time_range');
+    end
+    if isfield(mt_geoinfo,'traveltime_surface')
+        mt_geoinfo.twt_sur = mt_geoinfo.traveltime_surface;
+        mt_geoinfo = rmfield(mt_geoinfo,'traveltime_surface');
+    end
+    if isfield(mt_geoinfo,'traveltime_bottom')
+        mt_geoinfo.twt_bot = mt_geoinfo.traveltime_bottom;
+        mt_geoinfo = rmfield(mt_geoinfo,'traveltime_bottom');
+    end
+    if isfield(mt_geoinfo,'latitude')
+        mt_geoinfo.lat = mt_geoinfo.latitude;
+        mt_geoinfo = rmfield(mt_geoinfo,'latitude');
+    end
+    if isfield(mt_geoinfo,'longitude')
+        mt_geoinfo.lon = mt_geoinfo.longitude;
+        mt_geoinfo = rmfield(mt_geoinfo,'longitude');
+    end
+    if isfield(mt_geoinfo,'elevation_surface')
+        mt_geoinfo.elevation_sur = mt_geoinfo.elevation_surface;
+        mt_geoinfo = rmfield(mt_geoinfo,'elevation_surface');
+    end
+    if isfield(mt_geoinfo,'distance')
+        mt_geoinfo.dist = mt_geoinfo.distance;
+        mt_geoinfo = rmfield(mt_geoinfo,'distance');
+    end
+    if isfield(mt_geoinfo,'elevation_bed')
+        mt_geoinfo = rmfield(mt_geoinfo,'elevation_bed');
+    end
+    if isfield(mt_geoinfo,'thickness')
+        mt_geoinfo = rmfield(mt_geoinfo,'thickness');
+    end
+    if isfield(mt_geoinfo,'x')
+        mt_geoinfo = rmfield(mt_geoinfo,'x');
+    end
+    if isfield(mt_geoinfo,'y')
+        mt_geoinfo = rmfield(mt_geoinfo,'y');
+    end
+    if isfield(mt_geoinfo,'time_pick_abs')
+        mt_geoinfo = rmfield(mt_geoinfo,'time_pick_abs');
+    end
+    save(mt_filepath, '-struct', 'mt_geoinfo');
+    disp(append('The file ', mt_file,' was updated so that it is compatible with current picken version.'))    
 else
     option_alert = append("move_option '", m_option, "' is not known.");
     disp(option_alert)
 end
 
 %%
-db_echogram = mag2db(mt_geoinfo.echogram);
-f = figure(2); % of flat data with seed points
-imagesc(db_echogram);
-colormap(jet)
-hold on
-set(gcf,'doublebuffer','on');
-a = gca;
-cmin = round(min(db_echogram,[],'all')+50);
-cmax = round(max(db_echogram,[],'all')-50);
-%cini = min(cmax,-150);
-set(a,'CLim',[cmin, cmax]);
-clear db_echogram
+try
+    db_echogram = mag2db(mt_geoinfo.data);
+    f = figure(2); % of flat data with seed points
+    imagesc(db_echogram);
+    colormap(jet)
+    hold on
+    set(gcf,'doublebuffer','on');
+    a = gca;
+    cmin = round(min(db_echogram,[],'all')+50);
+    cmax = round(max(db_echogram,[],'all')-50);
+    %cini = min(cmax,-150);
+    set(a,'CLim',[cmin, cmax]);
+    clear db_echogram
 
-apos=get(a,'position');
-set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
-bpos=[0.35 apos(2)-0.05 0.145 0.05];
-cpos=[0.505 apos(2)-0.05 0.14 0.05];
+    apos=get(a,'position');
+    set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
+    bpos=[0.35 apos(2)-0.05 0.145 0.05];
+    cpos=[0.505 apos(2)-0.05 0.14 0.05];
 
-cl = 1; % Set number of current layer    
+    cl = 1; % Set number of current layer    
 
-ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10'},'Units','normalized','Position',bpos,...
-                  'value',cl,'callback', @layer_callback); % Choose layer.
+    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10'},'Units','normalized','Position',bpos,...
+                      'value',cl,'callback', @layer_callback); % Choose layer.
 
-ui_f1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save changes','Units','normalized','Position',cpos,...
-              'callback',@save_callback); % Finish selection
+    ui_f1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save changes','Units','normalized','Position',cpos,...
+                  'callback',@save_callback); % Finish selection
 
-layerplot = plot(1:length(mt_geoinfo.layers),mt_geoinfo.layers,'k-x',1:length(mt_geoinfo.layers(cl,:)),mt_geoinfo.layers(cl,:),'b-x');
-disp('Press "Save changes" to write changes to file.')
+    layerplot = plot(1:length(mt_geoinfo.layers),mt_geoinfo.layers,'k-x',1:length(mt_geoinfo.layers(cl,:)),mt_geoinfo.layers(cl,:),'b-x');
+    disp('Press "Save changes" to write changes to file.')
+end
 
+%%
     function layer_callback(~, ~)
         cl = get(gcbo,'value');
         try

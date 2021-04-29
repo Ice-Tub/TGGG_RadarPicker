@@ -70,7 +70,7 @@ function [icoefs,inums,ikurto, iratio ] = findpeakscwt(idata,scales,wavelet,...
 % %                 end
 % %             end
         end
-%           
+%       
         % findpeaks along the cwt row
         [~,locs] = findpeaks(cwtRow,'minpeakheight',bgmax);
         % if there is no peaks found in this cwt row, continue in next row
