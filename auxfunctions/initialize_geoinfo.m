@@ -46,6 +46,10 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks;
     end
 
+    if ~isfield(geoinfo,'version')
+        geoinfo = update_geoinfo(geoinfo);
+    end
+    
     if opt.delete_stripes
         geoinfo.data_org = geoinfo.data;
         data_mean = mean(geoinfo.data_org,2);
