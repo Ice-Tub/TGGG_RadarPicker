@@ -1,4 +1,4 @@
-function run_picker(opt, tp)
+function [geoinfo] = run_picker(opt, tp)
 % RUN_PICKER executes the picking routine.
     % This function calls the 
 

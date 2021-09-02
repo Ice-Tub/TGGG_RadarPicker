@@ -45,4 +45,4 @@ tp.RefHeight=600;             %set the maximum height for topo correction of ech
 
 %%
 addpath(append(pwd,'\auxfunctions'))
-run_picker(opt, tp)
+geoinfo = run_picker(opt, tp);
