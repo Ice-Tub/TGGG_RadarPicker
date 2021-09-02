@@ -60,8 +60,10 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         data = data(rows, :); % Only cut of rows
         twt = twt(rows, 1);
     elseif nargin > 3
-        if clms == 'full'
-            clms = 1:size(data,2);
+        if isstring(clms)
+            if strcmpi(clms, 'full')
+                clms = 1:size(data,2);
+            end
         end
         data = data(rows, clms);
         twt = twt(rows);
