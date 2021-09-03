@@ -10,9 +10,9 @@ function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
     normalized_data = data_scaled - horizontal_mean;
 
     BottomInds = zeros(1,geoinfo.num_trace);
-    [~,BottomInds(1)] = max(normalized_data(MinBottomPick(1):MaxBottomPick,1));
+    [~,BottomInds(1)] = max(normalized_data(MinBottomPick(1):MaxBottomPick(1),1));
     for n=2:geoinfo.num_trace
-        [~,Ind] = findpeaks(normalized_data(MinBottomPick(n):MaxBottomPick,n),'SortStr','descend','NPeaks',tp.num_bottom_peaks);
+        [~,Ind] = findpeaks(normalized_data(MinBottomPick(n):MaxBottomPick(n),n),'SortStr','descend','NPeaks',tp.num_bottom_peaks);
         [~, pos] = min(abs(Ind-BottomInds(n-1)));
         BottomInds(n) = Ind(pos);
     end
