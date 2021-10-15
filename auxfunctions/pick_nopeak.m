@@ -1,4 +1,4 @@
-function [y_trace] = pick_nopeak(layer, x_trace, current_window, leftright, nopeaks_window)
+function [ind] = pick_nopeak(layer, x_trace, current_window, leftright, nopeaks_window)
 %PICK_NOPEAK Calculates how the layer is propagated in case there is no
 %local extremum in intensity
 
@@ -38,10 +38,10 @@ if x_trace > (nopeaks_window + 1) && x_trace < (length(layer) - nopeaks_window)
         predicted_position = length(current_window);
     end
 
-    y_trace = current_window(predicted_position);
+    ind = predicted_position;
     
 else
-    y_trace = current_window(lmid);
+    ind = lmid;
 
     
 end

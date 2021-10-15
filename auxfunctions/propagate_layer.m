@@ -34,7 +34,7 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
                 if opt.median_peaks
                     [lind,p] = peaks_median(opt, geoinfo, current_window, x_trace);
                 elseif opt.interpol_peaks
-                    lind = interpol_index(opt, geoinfo, x_trace, current_window); % always only returns one index
+                    lind = interpol_index(opt, tp, geoinfo, layer, x_trace, current_window, leftright); % always only returns one index
                 else
                    [lind,p] = find_max_min(opt, geoinfo.data(current_window,x_trace));
                 end
@@ -62,7 +62,9 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
                 % If activated, use direction of last update for current
                 % one
                 if opt.nopeak_step
-                    [y_trace] = pick_nopeak(layer, x_trace, current_window, leftright, tp.nopeaks_window);
+                    
+                    lind = pick_nopeak(layer, x_trace, current_window, leftright, tp.nopeaks_window);
+                    y_trace = current_window(lind);
                 end
                 
                 quality(x_trace)=6;

@@ -1,4 +1,4 @@
-function [ind] = interpol_index(opt, geoinfo, x_trace, current_window)
+function [ind] = interpol_index(opt, tp, geoinfo, layer, x_trace, current_window, leftright)
 %MEAN_PEAK_INDEX Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -8,11 +8,9 @@ function [ind] = interpol_index(opt, geoinfo, x_trace, current_window)
 % approach)
 % -------------------------------------------------------------------------
 % POSSIBLE IMPROVEMENTS
-% - only use linear regression when more than one peak are found? (otherwise 
+% - only use linear regression when more than one peak is found? (otherwise 
 %   fit might not work properly)
 % - the prominence of the peaks could be used as weight factor
-% - choice of index in case of no peaks could be improved, e.g. by including 
-%   the previous step and continuing it (adaptation of pick_nopeak function?)
 
 
 ub = floor(length(current_window)/2);
@@ -69,7 +67,7 @@ end
             ind = 1;
         end
     else
-        ind = lmid; 
+        ind = pick_nopeak(layer, x_trace, current_window, leftright, tp.nopeaks_window); 
     end
 
 
