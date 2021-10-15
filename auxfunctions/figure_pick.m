@@ -8,7 +8,24 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
         data_scaled = mag2db(geoinfo.data); % Rescale MCoRDS data to db.
         slider_step = [1/100, 1/10];
     elseif strcmpi(opt.input_type, 'GPR_LF')
+        
+         % if filter_frequencies activated, filter frequencies over 10 MHz
+        if opt.filter_frequencies
+            dt = geoinfo.twt(2)-geoinfo.twt(1);
+            geoinfo.data_filtered = lowpass(geoinfo.data, 1*10^7*dt);
+            data_scaled = geoinfo.data_filtered;
+            slider_step = [1/1000, 1/100];
+        else
+            data_scaled = geoinfo.data;
+            slider_step = [1/1000, 1/100];
+        end
+        
+        
+    elseif strcmpi(opt.input_type, 'GPR_HF')
         data_scaled = geoinfo.data;
+        slider_step = [1/1000, 1/100];
+    elseif strcmpi(opt.input_type, 'awi_flight')
+        data_scaled = geoinfo.data./max(geoinfo.data(:));
         slider_step = [1/1000, 1/100];
     end
     
@@ -16,11 +33,24 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
     [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
     
     f = figure(2); % of flat data with seed points
-    imagesc(data_scaled);
-    colormap(opt.cmp)
+    
+    if strcmpi(opt.input_type, 'awi_flight')
+        imagesc(data_scaled)
+        colormap(opt.cmp)
+        caxis([-0.04 0.06])
+    else
+        imagesc(data_scaled);
+        colormap(opt.cmp)
+        caxis([-0.05,0.01])
+    end
+    
+  
+    colorbar
+   
+    
     hold on
     plot(sx,sy,'r*', 'MarkerSize', 2) % plot seedpoints
-    set(gcf,'doublebuffer','on');
+    %set(gcf,'doublebuffer','on');
     a = gca;
 
     %% Create color slider and buttons
@@ -35,7 +65,12 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
     f1pos=[apos(3)/3+0.54 apos(2)-0.03 0.12 0.05];
     f2pos=[apos(3)/3+0.54 apos(2)-0.09 0.12 0.05];
 
-    cr_half = opt.len_color_range/2;
+    if strcmpi(opt.input_type, 'GPR_HF')
+        cr_half = 0.02;
+    else
+        cr_half = opt.len_color_range/2;
+    end
+    
     cmin = round(min(data_scaled,[],'all')+cr_half,2); % Added 2 for GPR here.
     cmax = round(max(data_scaled,[],'all')-cr_half,2);
     cini = (cmin+cmax)/2;
@@ -55,7 +90,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
                     'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
     cl = 1; % Set number of current layers    
-    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10'},'Units','normalized','Position',cpos,...
+    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13'},'Units','normalized','Position',cpos,...
                   'value',cl,'callback', @layer_callback); % Choose layer.
 
     leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
@@ -82,7 +117,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
     end
     
     %% Receiving manual picks
-    % Make NaN matrix for 10 (opt.nol) possible layers
+    % Make NaN matrix for opt.nol possible layers
     if ~isfield(geoinfo,'layers')
         geoinfo.layers = NaN(opt.nol,geoinfo.num_trace);
         geoinfo.qualities = NaN(opt.nol,geoinfo.num_trace);
@@ -108,7 +143,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
            disp('Pick next point. To move or zoom, press enter.')
         end
 
-        [x,y,type]=ginput(); %gathers points until return
+        [x,y,type]=ginput(); % gathers points until return
 
         if ~get(ui_f2, 'UserData')
             break
@@ -121,7 +156,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
         end
         layer = geoinfo.layers(cl,:);
         quality = geoinfo.qualities(cl,:);
-        if type_in == 1 % Right click, create picks.
+        if type_in == 1 % Left click, create picks. 
             %picks{cl}(end+1,:) = [x_in, y_in]; % Add new picks to pick-cell
 
             isnewlayer = all(isnan(layer), 'all'); % Check if layer is empty (True/False).
@@ -130,7 +165,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
             if isnewlayer
                 [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_in,-leftright,0);
             end
-        elseif type_in==3 % Left click, delete picks.
+        elseif type_in==3 % Right click, delete picks.
             if editing_mode
                 del_min = max(1, x_in-opt.editing_window);
                 del_max = min(length(layer), x_in+opt.editing_window);
