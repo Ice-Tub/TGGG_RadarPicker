@@ -52,6 +52,45 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         psY = input.y;
         elevation_sur = input.z;
         time_gps = input.gpsclock;
+        
+    elseif strcmp(inputtype, 'GPR_HF')
+        org_name = fields(input);
+        input = input.(org_name{1});
+        
+        % process data
+        hil = hilbert(input.wfm);
+        env = abs(hil);
+        smoothed_env = movmedian_2d(env, 20);
+        norm_env = smoothed_env/max(smoothed_env, [], 'all');
+     
+        
+        data = norm_env;
+        psX = input.x;
+        psY = input.y; 
+        elevation_sur = input.z; 
+        dt = 0.2931; % which unit? This is sampling interval, can I use it to calculate TWT?
+        twt = (1:size(data,1))' * dt * 1e-9; % calculate TWT for GPR_HF data 
+        
+        % initialize data that does not exist for GPR_HF
+        lat = NaN(1, size(data,2));
+        lon = NaN(1, size(data,2));
+        time_gps = NaN(size(data,2), 1);
+        twt_sur = zeros(length(lat));
+        twt_bot = NaN(length(lat));
+        
+    elseif strcmp(inputtype, 'awi_flight')
+        
+        data = input.wfm;
+        twt = input.twt';
+        twt_sur = NaN(length(input.lat));
+        twt_bot = NaN(length(input.lat));
+        lat = input.lat;
+        lon = input.lon;
+        psX = input.x;
+        psY = input.y;
+        elevation_sur = input.z;
+        time_gps = NaN(size(data,2), 1);
+        
     else
         disp(append("Inputfile type '", inputtype ,"' is unknown."))
     end
@@ -60,8 +99,8 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         data = data(rows, :); % Only cut of rows
         twt = twt(rows, 1);
     elseif nargin > 3
-        if isstring(clms)
-            if strcmpi(clms, 'full')
+        if ischar(clms)
+            if strcmp(clms, 'all_clms')
                 clms = 1:size(data,2);
             end
         end
@@ -77,7 +116,8 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         time_gps = time_gps(clms);
     end
     
-    x_dist = psX - psX(1); y_dist = psY - psY(1);
+    x_dist = psX - psX(1); 
+    y_dist = psY - psY(1);
     dist = sqrt(x_dist.^2 + y_dist.^2);
     num_trace = length(lat);
     num_layer = [];
@@ -86,7 +126,7 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
          dist = dist/1000;
     end
     
-    geoinfo.data = data;
+    geoinfo.data = data; 
     geoinfo.twt = twt;
     geoinfo.twt_sur = twt_sur;
     geoinfo.twt_bot = twt_bot;
