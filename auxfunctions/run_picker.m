@@ -3,7 +3,7 @@ function [geoinfo] = run_picker(opt, tp)
     % This function calls the 
 
 %%
-    opt.nol = 10; % Number of layers. This options sets the nol that can be
+    opt.nol = 13; % Number of layers. This options sets the nol that can be
     % be picked. Not include in 'picker.m', because changing it requires
     % GUI adaptation and might cause loss of data.
     
