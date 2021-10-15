@@ -10,8 +10,8 @@ if ~contains(mt_file, '.mat')
     mt_file = append(mt_file, '.mat');
 end
 
-    mf_filepath = append(pwd, '\', data_folder, '\', mf_file);
-    mt_filepath = append(pwd, '\', data_folder, '\', mt_file);
+    mf_filepath = append(pwd, '/', data_folder, '/', mf_file);
+    mt_filepath = append(pwd, '/', data_folder, '/', mt_file);
     
 mf_geoinfo = load(mf_filepath);
 mt_geoinfo = load(mt_filepath);
