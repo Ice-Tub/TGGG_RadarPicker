@@ -63,7 +63,7 @@ tp.bgSkip = 150;              %decide how many pixels below bed layer is counted
 tp.RefHeight = 300;             %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 
 % Other Parameters
-tp.nopeaks_window = 5;       % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
+tp.nopeaks_window = 10;       % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
 tp.weight_factor = 2;         % states how much the previous direction of layer propagation is weighted in comparison to peak prominence in propagate_layer 
 tp.ice_velocity = 1.68e8;     % ice velocity used for topographical correction
 %%
