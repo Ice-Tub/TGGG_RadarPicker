@@ -2,19 +2,11 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
 %INITIALIZE_GEOINFO loads or creates geoinfo.
 %   Detailed explanation goes here
 
-    if opt.create_new_geoinfo
+    if opt.create_new_geoinfo || ~isfile(opt.filename_geoinfo)
         geoinfo = readdata(opt.filename_input_data,opt.input_type,tp.rows,tp.clms);
-        if isstring(tp.clms)
-            if strcmpi(tp.clms, 'full')
-                tp.clms = 1:size(data,2);
-            end
-        end
-        opt.update_bottom = 1;
-    elseif ~isfile(opt.filename_geoinfo)
-        geoinfo = readdata(opt.filename_input_data,opt.input_type,tp.rows,tp.clms);
-        if isstring(tp.clms)
-            if strcmpi(tp.clms, 'full')
-                tp.clms = 1:size(data,2);
+        if ischar(tp.clms)
+            if strcmp(tp.clms, 'all_clms')
+                tp.clms = 1:size(geoinfo.data,2);
             end
         end
         opt.update_bottom = 1;
@@ -59,5 +51,9 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         data_mean = mean(geoinfo.data_org,2);
         geoinfo.data = geoinfo.data_org-data_mean;
     end
+    
+    
+   
+    
 end
 
