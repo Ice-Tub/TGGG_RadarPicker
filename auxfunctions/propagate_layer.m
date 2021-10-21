@@ -20,6 +20,7 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
             else
                 %disp('###closest seed')
                wdist = abs(lind - lmid);
+               lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value.
                y_trace = current_window(lind);
                quality(x_trace)=3;
             end
