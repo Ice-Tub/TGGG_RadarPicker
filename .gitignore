@@ -1,5 +1,7 @@
 
 data/
+temp/
+Figures/
 
 *.mat
 *.asv
