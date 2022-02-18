@@ -52,7 +52,7 @@ opt.editing_window = 10;    % Number of traces that are updated in editing mode.
 % For cutting the data
 tp.clms='all_clms';              % If an existing file is loaded, this option is overwritten.
 %tp.clms=1000:5000;              % If an existing file is loaded, this option is overwritten.
-tp.rows=200:5000;                % cuts the radargram to limit processing (time) (top and bottom)
+tp.rows=200:5000;                % cuts the radargram to limit processing (time) (top and bottom), needs to be deep eough for bgSkip to work 
 
 % For surface and bottom pick
 tp.MinBinForSurfacePick = 300;  % when already preselected, this can be small
