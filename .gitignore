@@ -1,6 +1,7 @@
 
 temp/
 Figures/
+data/
 
 *.mat
 !TopoData_20190106_01_006.mat
