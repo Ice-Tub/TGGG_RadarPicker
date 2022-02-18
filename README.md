@@ -1,6 +1,6 @@
 # picking_isochrones
 
-To pick layers in airborne radar data you need to run 'pick_manually.m', in which you can also set the options for the picking.
+To pick layers in airborne radar data you need to run 'picker_mcords.m' or 'picker_gpr', in which you can also set the options for the picking.
 
 %%% Input
 Data:
