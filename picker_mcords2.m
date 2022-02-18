@@ -55,29 +55,30 @@ tp.clms='all_clms';              % If an existing file is loaded, this option is
 tp.rows=200:5000;                % cuts the radargram to limit processing (time) (top and bottom)
 
 % For surface and bottom pick
-tp.MinBinForSurfacePick = 300; % when already preselected, this can be small
+tp.MinBinForSurfacePick = 300;  % when already preselected, this can be small
 %tp.MinBinForSurfacePick = 400; % when already preselected, this can be small
-tp.smooth_sur=40;             % between 30 and 60 seems to be good
+tp.smooth_sur=40;               % between 30 and 60 seems to be good
 tp.MinBinForBottomPick = 2000;
 %tp.MinBinForBottomPick = 2500;
 tp.MaxBinForBottomPick = 4000;
-tp.num_bottom_peaks = 5;      % Number of strongest peaks considered as bottom pick. 10 is a good guess.
+tp.num_bottom_peaks = 5;        % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 
 
 % For computation of seeds (Only possible for MCoRDS-data)
-tp.window = 9;                  %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
+tp.window = 9;                  % vertical window, keep small to avoid jumping. Even numbers work as next odd number.
 tp.seedthresh = 5;              % 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
 
 %wavelet parameters
-tp.wavelet = 'mexh';          % choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results
-tp.maxwavelet = 16;             %min is always 3, layers size is half the wavelet scale
-tp.bgSkip = 50;              %decide how many pixels below bed layer is counted as background noise: default is 50 - makes a big difference for m-exh, higher is better
+tp.wavelet = 'mexh';            % choose the wavelet 'mexh' or 'morl' - Mexican Hat (mexh) gives cleaner results
+tp.maxwavelet = 16;             % min is always 3, layers size is half the wavelet scale
+tp.bgSkip = 50;                 % decide how many pixels below bed layer is counted as background noise: default is 50 - makes a big difference for m-exh, higher is better
+                                % gives a big ERROR if this is set beyond the domain
 tp.RefHeight = 600;             %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 
 % Other Parameters
-tp.nopeaks_window = 10;       % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
-tp.weight_factor = 2;         % states how much the previous direction of layer propagation is weighted in comparison to peak prominence in propagate_layer 
-tp.ice_velocity = 1.68e8;     % ice velocity used for topographical correction
+tp.nopeaks_window = 10;         % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
+tp.weight_factor = 2;           % states how much the previous direction of layer propagation is weighted in comparison to peak prominence in propagate_layer 
+tp.ice_velocity = 1.68e8;       % ice velocity used for topographical correction
 %%
 addpath(append(pwd,'\auxfunctions'))
 %geoinfo = run_picker(opt, tp);
