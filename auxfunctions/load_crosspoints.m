@@ -1,4 +1,4 @@
-function [cp_idx,cp_layers] = load_crosspoints(geoinfo,opt)
+function [metadata, cp_idx,cp_layers] = load_crosspoints(geoinfo, metadata, opt)
 %LOAD_CROSSPOINTS Summary of this function goes here
 %   Detailed explanation goes here
     cp_idx = NaN;
@@ -20,6 +20,8 @@ function [cp_idx,cp_layers] = load_crosspoints(geoinfo,opt)
         if val_dist < distthresh
             geoinfo_co_idx = pos_dist; 
             geoinfo_idx = points_dist(pos_dist);
+            [~,nameCO,~] =fileparts(opt.filenames_cross{k}); 
+            metadata.crossover{end+1} = nameCO; % add the filenames of crossover profiles to metadata 
         else
             clear geoinfo_co_idx geoinfo_idx
         end
