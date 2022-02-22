@@ -1,4 +1,4 @@
-function [geoinfo] = figure_pick(geoinfo, tp, opt)
+function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
 %FIGURE_PICK Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -90,7 +90,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
                     'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
     cl = 1; % Set number of current layers    
-    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13'},'Units','normalized','Position',cpos,...
+    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13', 'Layer 14', 'Layer 15', 'Layer 16', 'Layer 17', 'Layer 18'},'Units','normalized','Position',cpos,...
                   'value',cl,'callback', @layer_callback); % Choose layer.
 
     leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
@@ -112,7 +112,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
 
     %% Plot cross points.
     if opt.load_crossover
-        [cp_idx,cp_layers] = load_crosspoints(geoinfo,opt);
+        [metadata, cp_idx,cp_layers] = load_crosspoints(geoinfo,metadata, opt);
         co_plot = plot(cp_idx,cp_layers,'k*', cp_idx, cp_layers(cl,:),'b*', 'MarkerSize', 16);% this plots the overlapping point in this graph
     end
     
@@ -197,6 +197,16 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
             qualities_old = geoinfo.qualities;
             geoinfo.layers(cl,:) = layer;
             geoinfo.qualities(cl,:) = quality;
+            % add layer and date to metadata
+            
+            layerName = strcat('Layer', sprintf('%u', cl));
+            layerDate = strcat('Layer', sprintf('%u', cl), '_date');
+            layerInterruptions = strcat('Layer', sprintf('%u', cl), '_interruption');
+            
+            metadata.(layerName) = layer;
+            metadata.(layerDate) = date;
+            metadata.(layerInterruptions) = compute_interruption(layer);
+             
         end
         % Plot updated layer
         try
@@ -243,7 +253,7 @@ function [geoinfo] = figure_pick(geoinfo, tp, opt)
 
 
     function save_callback(~, ~)
-        save_picks(geoinfo,tp,opt)
+        save_picks(geoinfo,metadata,tp,opt)
         disp('Picks are saved.');
     end
 
