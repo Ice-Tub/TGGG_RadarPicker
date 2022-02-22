@@ -2,23 +2,15 @@ function save_metadata(opt, metadata)
 %SAVE_METADATA Save metadata
 %   
 
-% check if old metadata exists and, if so, replace the new points
+% check if old metadata exists and, if so, replace the dates of newly
+% picked layers
 if isfile(opt.file_metadata)
     oldMetadata = load(opt.file_metadata);
     for ii = 1:opt.nol
-        layerName = strcat('Layer', sprintf('%u', ii));
-        layerDate = strcat('Layer', sprintf('%u', ii), '_date');
-        layerInterruptions = strcat('Layer', sprintf('%u', ii), '_interruption');
-
-        % check if old metadata contains layers which are either not
-        % included in metadata or outdated
-        if isfield(oldMetadata, layerName)
-            if ~isfield(metadata, layerName)
-                metadata.(layerName) = oldMetadata.(layerName);
-                metadata.(layerDate) = oldMetadata.(layerDate);
-                metadata.(layerInterruptions) = oldMetadata.(layerInterruptions);
+        if ~strcmp(oldMetadata.pickingDates{ii}, 'not picked')
+            if strcmp(metadata.pickingDates{ii}, 'not picked')
+                metadata.pickingDates{ii} = oldMetadata.pickingDates{ii}; 
             end
-
         end
     end  
 end
