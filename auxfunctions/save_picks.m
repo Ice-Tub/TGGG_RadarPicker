@@ -1,4 +1,4 @@
-function save_picks(geoinfo,tp,opt)
+function save_picks(geoinfo,metadata,tp,opt)
 %SAVE_PICKS Summary of this function goes here
 %   Detailed explanation goes here
         if isfield(geoinfo,'data_org')
@@ -40,31 +40,34 @@ function save_picks(geoinfo,tp,opt)
             layers_relto_surface = geoinfo.layers - surface_ind;
             bottom_relto_surface = bottom_ind - surface_ind;
 
-
-            layers_topo = layers_relto_surface + binshift;
-            bottom_topo = bottom_relto_surface + binshift;
-
-            % these are the final, corrected layers and bottom
-            layers_topo_depth = tp.RefHeight - layers_topo * dz;
-            bottom_topo_depth = tp.RefHeight - bottom_topo * dz;
             
             geoinfo.layers_relto_surface = layers_relto_surface;
-            geoinfo.layers_topo = layers_topo;
-            geoinfo.layers_topo_depth = layers_topo_depth;
-            
             geoinfo.bottom_relto_surface = bottom_relto_surface;
-            geoinfo.bottom_topo = bottom_topo; 
-            geoinfo.bottom_topo_depth = bottom_topo_depth;
+
+            % layers relative to surface in twt
+            layers_twt = layers_relto_surface * dt;
+            geoinfo.layers_twt = layers_twt;
+
+            % add the layers to metadata
+            for ii = 1:opt.nol
+                if sum(isnan(layers_twt(ii,:))) ~= length(layers_twt(ii,:))
+                    layerTwt = strcat('Layer', sprintf('%u', ii), '_twt_relto_surf');
+                    metadata.(layerTwt) = layers_twt(ii,:);
+                end
+            end
+           
         end
         
         
         
         geoinfo.num_layer = sum(max(~isnan(geoinfo.layers),[],2));
         geoinfo.tp = tp;
-        
+
+       
         
         save(opt.filename_geoinfo, '-struct', 'geoinfo');
-        
+        save_metadata(opt, metadata)
+
         geoinfo.data_org = geoinfo.data;
         data_mean = mean(geoinfo.data_org,2);
         geoinfo.data = geoinfo.data_org-data_mean;
