@@ -11,6 +11,8 @@ metadata.twt = geoinfo.twt;
 metadata.radarType = opt.input_type;
 metadata.frequency = opt.frequency;
 metadata.crossover = {};
+metadata.pickingDates(1:opt.nol) = {'not picked'};
+metadata.interruptions(1:opt.nol) = {'not picked'};
 
 end
 
