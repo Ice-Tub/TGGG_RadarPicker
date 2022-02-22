@@ -48,17 +48,16 @@ function save_picks(geoinfo,metadata,tp,opt)
             layers_twt = layers_relto_surface * dt;
             geoinfo.layers_twt = layers_twt;
 
-            % add the layers to metadata
-            for ii = 1:opt.nol
-                if sum(isnan(layers_twt(ii,:))) ~= length(layers_twt(ii,:))
-                    layerTwt = strcat('Layer', sprintf('%u', ii), '_twt_relto_surf');
-                    metadata.(layerTwt) = layers_twt(ii,:);
-                end
-            end
+            % add  layers to metadata
+           metadata.layer_twt = layers_twt;
            
         end
         
-        
+        %compute interruptions in layer for metadata and save layer
+        for ii = 1:opt.nol
+            metadata.interruptions{ii} = compute_interruption(geoinfo.layers(ii,:));
+        end
+        metadata.layer = geoinfo.layers;
         
         geoinfo.num_layer = sum(max(~isnan(geoinfo.layers),[],2));
         geoinfo.tp = tp;

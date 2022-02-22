@@ -19,7 +19,7 @@ end
 % calculate how many interruptions occur (only if they are longer than 10
 % pixel)
 
-limitInterruption = 10;
+limitInterruption = 2;
 count = 0;
 numberOfInterruptions = 0;
 
@@ -52,8 +52,12 @@ if sum(interruption) > limitInterruption
 
 end
 
-interruption = strcat(string(numberOfInterruptions), ' interruption(s)');
-
+% only save number of interruptions if the layer has any picked data
+if ~sum(logArr) == 0
+    interruption = strcat(string(numberOfInterruptions), ' interruption(s)');
+else
+    interruption = 'not picked';
 end
 
+end
 
