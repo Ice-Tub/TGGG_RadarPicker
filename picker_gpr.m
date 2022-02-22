@@ -14,11 +14,17 @@ close all;
 % Data
 opt.input_type = 'GPR_LF'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
 opt.input_folder = '/data/GPR_LF_data/Belare2010/GPR_LF/';
-opt.input_file = 'data20101205_lv1';
+opt.input_file = 'data20101212_gl_lv1';
 opt.output_folder = '/data/picked_data';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = 'data20101205_lv1'; % Define a suffix for the layerdata-file.
+opt.output_suffix = 'data20101212_gl_lv1'; % Define a suffix for the layerdata-file.
+opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
+opt.coordinator = 'Reinhard Drews';
+opt.picker = 'Leah Sophie Muhle';
+opt.frequency = '5 MHz';
+opt.date = date;
+
 
 % Options
 % The following options can be activated by setting: 1 = yes, 0 = no.
@@ -29,8 +35,8 @@ opt.keep_old_picks = 1;     % Keep old picks, when old geoinfo is loaded.
 opt.load_crossover = 1;     % Activate loading cross-over points.
 opt.delete_stripes = 0;     % If activated, the horizontal mean will be subtracted from data.01 
 opt.filter_frequencies = 1; % If activated, frequencies higher than 10 MHz will be filtered from signal; applies only to GPR_LF data
-opt.median_peaks = 0;       % If activated, not the intensity peaks, but the median intensities from a tp.window x tp.window environment will be used for findpeaks
-opt.interpol_peaks = 1;     % If activated, linear interpolation of all the peaks in a tp.window x tp.window field are computed for layer propagation. This and medianpeaks should not be activated simultaneously. 
+opt.median_peaks = 1;       % If activated, not the intensity peaks, but the median intensities from a tp.window x tp.window environment will be used for findpeaks
+opt.interpol_peaks = 0;     % If activated, linear interpolation of all the peaks in a tp.window x tp.window field are computed for layer propagation. This and medianpeaks should not be activated simultaneously. 
 opt.nopeak_step = 1;        % Use the previous step instead of the same height for propagate_layer if no local extremum of intensity can be found
 opt.find_maxima = 0;        % If activated, maxima are picked. Otherwise minima are picked. 
 
@@ -42,7 +48,7 @@ opt.editing_window = 10;    % Number of traces that are updated in editing mode.
 %%% Tuning parameters
 % For cutting the data
 tp.clms='all_clms';              % If an existing file is loaded, this option is overwritten.
-tp.rows=1:1024;                % cuts the radargram to limit processing (time) (top and bottom)
+tp.rows=1:800;                % cuts the radargram to limit processing (time) (top and bottom)
 
 % For surface and bottom pick
 tp.MinBinForSurfacePick = 10; % when already preselected, this can be small
@@ -53,7 +59,7 @@ tp.num_bottom_peaks = 3;      % Number of strongest peaks considered as bottom p
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 
 
 % For computation of seeds (Only possible for MCoRDS-data)
-tp.window = 9;                  %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
+tp.window = 5;                  %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
 tp.seedthresh = 5;              % 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
 
 %wavelet parameters
