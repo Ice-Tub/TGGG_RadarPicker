@@ -19,7 +19,7 @@ end
 % calculate how many interruptions occur (only if they are longer than 10
 % pixel)
 
-limitInterruption = 2;
+limitInterruption = 10;
 count = 0;
 numberOfInterruptions = 0;
 
