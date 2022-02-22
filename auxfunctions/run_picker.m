@@ -3,7 +3,7 @@ function [geoinfo] = run_picker(opt, tp)
     % This function calls the 
 
 %%
-    opt.nol = 13; % Number of layers. This options sets the nol that can be
+    opt.nol = 18; % Number of layers. This options sets the nol that can be
     % be picked. Not include in 'picker.m', because changing it requires
     % GUI adaptation and might cause loss of data.
     
@@ -13,6 +13,7 @@ function [geoinfo] = run_picker(opt, tp)
     opt = file_interpreter(opt); % Interpret input settings for filenames.
     
     [geoinfo,tp] = initialize_geoinfo(tp,opt);
+    metadata = initialize_metadata(geoinfo, opt);
     
     [geoinfo, tp] = figure_tune(geoinfo,tp,opt);
     
@@ -31,9 +32,9 @@ function [geoinfo] = run_picker(opt, tp)
     % Activate to save geoinfo after preprocessing:
     %save(opt.filename_geoinfo, '-struct', 'geoinfo')
 %% Layer picking
-    geoinfo = figure_pick(geoinfo, tp, opt);
+    [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt);
 
-    save_picks(geoinfo,tp,opt) % Saving the geoinfo with picks
+    save_picks(geoinfo,metadata,tp,opt) % Saving the geoinfo with picks
     disp('Picking finished. Your picks have been saved.')
 end
 
