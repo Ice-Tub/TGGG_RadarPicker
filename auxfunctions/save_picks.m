@@ -58,6 +58,7 @@ function save_picks(geoinfo,metadata,tp,opt)
             metadata.interruptions{ii} = compute_interruption(geoinfo.layers(ii,:));
         end
         metadata.layer = geoinfo.layers;
+        metadata.qualities = geoinfo.qualities;
         
         geoinfo.num_layer = sum(max(~isnan(geoinfo.layers),[],2));
         geoinfo.tp = tp;
