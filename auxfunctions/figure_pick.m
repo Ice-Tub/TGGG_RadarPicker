@@ -197,15 +197,10 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
             qualities_old = geoinfo.qualities;
             geoinfo.layers(cl,:) = layer;
             geoinfo.qualities(cl,:) = quality;
-            % add layer and date to metadata
-            
-            layerName = strcat('Layer', sprintf('%u', cl));
-            layerDate = strcat('Layer', sprintf('%u', cl), '_date');
-            layerInterruptions = strcat('Layer', sprintf('%u', cl), '_interruption');
-            
-            metadata.(layerName) = layer;
-            metadata.(layerDate) = date;
-            metadata.(layerInterruptions) = compute_interruption(layer);
+
+            % add date to metadata
+            metadata.pickingDates{cl} = date;
+           
              
         end
         % Plot updated layer
