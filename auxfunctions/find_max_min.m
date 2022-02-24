@@ -9,7 +9,7 @@ if opt.find_maxima
     p = p(lind); 
     lind = find(lind);
     if isempty(lind)
-        [~,lind,~,p] = findpeaks(data); % multiply data with -1 to find its minima
+        [~,lind,~,p] = findpeaks(data); 
     end
 else
     % find local minima
