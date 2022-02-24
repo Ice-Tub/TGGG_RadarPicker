@@ -37,28 +37,32 @@ function save_picks(geoinfo,metadata,tp,opt)
 
 
             % adapt layers and bottom pick to topography
-            layers_relto_surface = geoinfo.layers - surface_ind;
-            bottom_relto_surface = bottom_ind - surface_ind;
+            layers_relto_surf = geoinfo.layers - surface_ind;
+            bottom_relto_surf = bottom_ind - surface_ind;
 
             
-            geoinfo.layers_relto_surface = layers_relto_surface;
-            geoinfo.bottom_relto_surface = bottom_relto_surface;
+            geoinfo.layers_relto_surf = layers_relto_surf;
+            geoinfo.bottom_relto_surf = bottom_relto_surf;
 
             % layers relative to surface in twt
-            layers_twt = layers_relto_surface * dt;
-            geoinfo.layers_twt = layers_twt;
+            layers_relto_surf_twt = layers_relto_surf * dt;
+            geoinfo.layers_relto_surf_twt = layers_relto_surf_twt;
 
-            % add  layers to metadata
-           metadata.layer_twt = layers_twt;
-           
+            % add layers, surface and bottom pick to metadata
+            metadata.IRH_relto_surf_twt = layers_relto_surf_twt;
+            metadata.IRH_relto_surf_bin = layers_relto_surf;
+
+            metadata.surface_bin = surface_ind;
+            metadata.surface_twt = time_surface;
+
+            metadata.bottom_relto_surf_twt = bottom_relto_surf * dt;
+            metadata.bottom_relto_surf_bin = bottom_relto_surf;
+
+            metadata.bottom_bin = bottom_ind;
+            metadata.bottom_twt = time_bottom;
         end
         
-        %compute interruptions in layer for metadata and save layer
-        for ii = 1:opt.nol
-            metadata.interruptions{ii} = compute_interruption(geoinfo.layers(ii,:));
-        end
-        metadata.layer = geoinfo.layers;
-        metadata.qualities = geoinfo.qualities;
+      
         
         geoinfo.num_layer = sum(max(~isnan(geoinfo.layers),[],2));
         geoinfo.tp = tp;
@@ -66,7 +70,7 @@ function save_picks(geoinfo,metadata,tp,opt)
        
         
         save(opt.filename_geoinfo, '-struct', 'geoinfo');
-        save_metadata(opt, metadata)
+        save_metadata(opt, geoinfo, metadata)
 
         geoinfo.data_org = geoinfo.data;
         data_mean = mean(geoinfo.data_org,2);
