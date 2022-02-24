@@ -62,3 +62,7 @@ You can finish picking by pressing 'End picking', this will also save you curren
 To conduct some simple corrections of your data files, you can run 'edit_datafiles.m'.
 
 This script can be used to 'swap' two layers, to 'overwrite' one layer with another (from the same or from a different file) or to simply 'view' a pick file.
+
+# Trouble Shooting, common errors
+
+'Reference to non-existent field 'peakim'.' this is often related to tp.bgSkip = 50. This means that the picker needs to have at least 50 bins below the picked bottom layer. It uses this as 'background noise' to calculate the seed points. Solution: adjust tp.rows to shore more or adjust BinForBottomPick 
