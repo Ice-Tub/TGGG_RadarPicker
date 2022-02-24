@@ -1,5 +1,7 @@
 # picking_isochrones
 
+#needs MATLABS signal processing toolbox
+
 To pick layers in airborne radar data you need to run 'picker_mcords.m' or 'picker_gpr', in which you can also set the options for the picking.
 'picker_mcords2.m' is set up to run one specific example.
 
