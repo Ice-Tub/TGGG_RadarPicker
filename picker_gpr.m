@@ -7,7 +7,7 @@ close all;
 % - decouple options, windows, etc. 
 % - observe which settings work for which profiles
 % - introduce seeds for other input types than MCoRDS
-% - load cross-over points for every profile (is there an issue with CO-points?)
+% - load cross-over points for every profile 
 % - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 % Working settings
@@ -48,13 +48,13 @@ opt.editing_window = 10;    % Number of traces that are updated in editing mode.
 %%% Tuning parameters
 % For cutting the data
 tp.clms='all_clms';              % If an existing file is loaded, this option is overwritten.
-tp.rows=1:800;                % cuts the radargram to limit processing (time) (top and bottom)
+tp.rows=1:1000;                % cuts the radargram to limit processing (time) (top and bottom)
 
 % For surface and bottom pick
 tp.MinBinForSurfacePick = 10; % when already preselected, this can be small
 tp.smooth_sur=40;             % between 30 and 60 seems to be good
 tp.MinBinForBottomPick = 200;
-tp.MaxBinForBottomPick = 900;
+tp.MaxBinForBottomPick = 950;
 tp.num_bottom_peaks = 3;      % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 
 
