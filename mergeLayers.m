@@ -12,8 +12,8 @@ end
 
 %% Concacenate layer data
 % twt and number of rows is assumed to be the same for all metadata
-merged.coordinator = allMetadata.metadata1.coordinator;
-merged.operator = allMetadata.metadata1.operator;
+merged.coordinator = {allMetadata.metadata1.coordinator};
+merged.operator = {allMetadata.metadata1.operator};
 merged.frequency = allMetadata.metadata1.frequency;
 merged.radarType = allMetadata.metadata1.radarType;
 merged.twt = allMetadata.metadata1.twt;
@@ -35,11 +35,13 @@ merged.IRH_twt = allMetadata.metadata1.IRH_twt;
 %merged.IRH_RelSurfBin = allMetadata.metadata1.IRH_relto_surf_bin;
 merged.IRH_RelSurfTwt = allMetadata.metadata1.IRH_relto_surf_twt;
 merged.qualities = allMetadata.metadata1.qualities;
-merged.interruption = allMetadata.metadata1.interruptions';
+merged.interruption = allMetadata.metadata1.interruptions;
 %merged.pickingDates = allMetadata.metadata1.pickingDates';
 
 for kk = 2:numberFiles
     currentName = append('metadata', num2str(kk));
+    merged.coordinator{kk} = allMetadata.(currentName).coordinator;
+    merged.operator{kk} = allMetadata.(currentName).operator;
     merged.psX = cat(2,merged.psX, allMetadata.(currentName).psX);
     merged.psY = cat(2,merged.psY, allMetadata.(currentName).psY);
     %merged.lon = cat(2,merged.lon, allMetadata.(currentName).lon);
@@ -55,7 +57,7 @@ for kk = 2:numberFiles
     %merged.IRH_RelSurfBin = cat(2,merged.IRH_RelSurfBin, allMetadata.(currentName).IRH_relto_surf_bin);
     merged.IRH_RelSurfTwt = cat(2,merged.IRH_RelSurfTwt, allMetadata.(currentName).IRH_relto_surf_twt);
     merged.qualities = cat(2,merged.qualities, allMetadata.(currentName).qualities);
-    merged.interruption = cat(2,merged.interruption, allMetadata.(currentName).interruptions');
+    merged.interruption =  cat(1, merged.interruption, allMetadata.(currentName).interruptions);
     %merged.pickingDates = cat(2,merged.pickingDates, allMetadata.(currentName).pickingDates');
 end
 
@@ -63,22 +65,38 @@ end
 numberLayers = size(merged.IRH_twt,1);
 
 for ll = 1:numberLayers
-    currentIRH = append('twtIRH', num2str(ll));
     currentRelIRH = append('relToSurfTwtIRH', num2str(ll));
-    merged.(currentIRH) = merged.IRH_twt(ll,:)';
+    currentQuality = append('qualityIRH', num2str(ll));
     merged.(currentRelIRH) = merged.IRH_RelSurfTwt(ll,:)';
+    merged.(currentQuality) = merged.qualities(ll,:)';
 end
 
-%% Save merged struct into txt file
-mergedTable = [merged.bottomTwt' merged.bottomRelSurfTwt' merged.surfaceTwt'];
-namesVariables = {'bottomTwt', 'bottomTwtRelToSurf', 'surfaceTwt'};
+%% Save merged struct into txt files
+namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
+mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
 
 for nn = 1:numberLayers
-    currentIRH = append('twtIRH', num2str(nn));
     currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
-    mergedTable = cat(2, mergedTable, merged.(currentIRH));
-    mergedTable = cat(2, mergedTable, merged.(currentRelIRH));
+    currentQuality = append('qualityIRH', num2str(nn));
+    currentTable = table(merged.(currentRelIRH), merged.(currentQuality), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn)), append('qualityIRH', num2str(nn))});
+    mergedTable = [mergedTable currentTable];
 end
 
-outputFileName = "/mergedLayer.txt";
-writetable(table(mergedTable), append(pwd,'/data/metadata', outputFileName), 'delimiter', ' ')
+outputFileNameIRH = "/mergedLayer.txt";
+writetable(mergedTable, append(pwd,'/data/metadata', outputFileNameIRH), 'delimiter', ',')
+
+% write remaining info to extra file
+infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('date: ', date)};
+
+
+
+for mm = 1:numberFiles
+    infoCell{end+1} = append('coordinator', num2str(mm),': ', merged.coordinator{mm});
+    infoCell{end+1} = append('operator', num2str(mm),': ', merged.operator{mm});
+    infoCell{end+1} = [append("interruption", num2str(mm), ": "), merged.interruption(mm,:)];
+end
+
+infoCell = infoCell';
+
+outputFileNameBasics = "/mergedLayer_basics.txt";
+writecell(infoCell, append(pwd,'/data/metadata', outputFileNameBasics), 'delimiter', ' ')
