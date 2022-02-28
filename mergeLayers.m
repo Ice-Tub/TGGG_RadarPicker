@@ -78,12 +78,16 @@ mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.s
 for nn = 1:numberLayers
     currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
     currentQuality = append('qualityIRH', num2str(nn));
+    %do not save layers if they are not picked
+    if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
+        continue
+    end
     currentTable = table(merged.(currentRelIRH), merged.(currentQuality), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn)), append('qualityIRH', num2str(nn))});
     mergedTable = [mergedTable currentTable];
 end
 
 outputFileNameIRH = "/mergedLayer.txt";
-writetable(mergedTable, append(pwd,'/data/metadata', outputFileNameIRH), 'delimiter', ',')
+writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
 infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('date: ', date)};
