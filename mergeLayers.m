@@ -103,4 +103,4 @@ end
 infoCell = infoCell';
 
 outputFileNameBasics = "/mergedLayer_basics.txt";
-writecell(infoCell, append(pwd,'/data/metadata', outputFileNameBasics), 'delimiter', ' ')
+writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
