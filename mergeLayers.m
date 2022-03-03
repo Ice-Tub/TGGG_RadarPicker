@@ -1,5 +1,9 @@
 clear 
 
+%% Set options
+save_qualities = 1;   % 0 if qualities should not be saved, 1 if qualities are saved
+save_bottom = 0;        % 0 if bottom twt should not be saved, 1 otherwise
+
 %% Load metadata files
 allFiles = dir('data/metadata/*.mat');
 numberFiles = length(allFiles);
@@ -72,8 +76,15 @@ for ll = 1:numberLayers
 end
 
 %% Save merged struct into txt files
-namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
-mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
+
+% save bottom only if desired
+if save_bottom
+    namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
+else
+    namesVariables = {'psX', 'psY', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.surfaceTwt', 'VariableNames', namesVariables);
+end
 
 % save twt of layers first 
 for nn = 1:numberLayers
@@ -86,16 +97,24 @@ for nn = 1:numberLayers
     mergedTable = [mergedTable currentTable];
 end
 
-% then save quality of layer
-for nn = 1:numberLayers
-    currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
-    currentQuality = append('qualityIRH', num2str(nn));
-    %do not save layers if they are not picked
-    if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
-        continue
+% then save quality of layer (if desired)
+if save_qualities
+    for nn = 1:numberLayers
+        currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
+        currentQuality = append('qualityIRH', num2str(nn));
+        
+        %do not save layers if they are not picked
+        if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
+            continue
+        end
+        % correction step for quality due to problem in old picker version
+        quality = merged.(currentQuality);
+        logInd = isnan(merged.(currentRelIRH));
+        quality(logInd) = NaN;
+
+        currentTable = table(quality, 'VariableNames', {append('qualityIRH', num2str(nn))});
+        mergedTable = [mergedTable currentTable];
     end
-    currentTable = table(merged.(currentQuality), 'VariableNames', {append('qualityIRH', num2str(nn))});
-    mergedTable = [mergedTable currentTable];
 end
 
 % save table to file
