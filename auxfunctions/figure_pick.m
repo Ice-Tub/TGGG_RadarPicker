@@ -166,6 +166,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
                 [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_in,-leftright,0);
             end
         elseif type_in==3 % Right click, delete picks.
+           
             if editing_mode
                 del_min = max(1, x_in-opt.editing_window);
                 del_max = min(length(layer), x_in+opt.editing_window);
@@ -178,7 +179,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
                 quality(x_in+1:del_max) = NaN;
             else
                 layer(del_min:x_in-1) = NaN;
-                quality(x_in+1:del_max) = NaN;
+                quality(del_min:x_in-1) = NaN;
             end
         elseif isempty(type_in)
             disp('Move and zoom. To continue picking, press enter.')
