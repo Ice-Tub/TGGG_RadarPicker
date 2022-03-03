@@ -75,6 +75,18 @@ end
 namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
 mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
 
+% save twt of layers first 
+for nn = 1:numberLayers
+    currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
+    %do not save layers if they are not picked
+    if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
+        continue
+    end
+    currentTable = table(merged.(currentRelIRH), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn))});
+    mergedTable = [mergedTable currentTable];
+end
+
+% then save quality of layer
 for nn = 1:numberLayers
     currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
     currentQuality = append('qualityIRH', num2str(nn));
@@ -82,16 +94,16 @@ for nn = 1:numberLayers
     if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
         continue
     end
-    currentTable = table(merged.(currentRelIRH), merged.(currentQuality), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn)), append('qualityIRH', num2str(nn))});
+    currentTable = table(merged.(currentQuality), 'VariableNames', {append('qualityIRH', num2str(nn))});
     mergedTable = [mergedTable currentTable];
 end
 
+% save table to file
 outputFileNameIRH = "/mergedLayer.txt";
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
 infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('date: ', date)};
-
 
 
 for mm = 1:numberFiles
