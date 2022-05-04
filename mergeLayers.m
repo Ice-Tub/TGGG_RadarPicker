@@ -2,10 +2,10 @@ clear
 
 %% Set options
 save_qualities = 1;   % 0 if qualities should not be saved, 1 if qualities are saved
-save_bottom = 0;        % 0 if bottom twt should not be saved, 1 otherwise
+save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
 
 %% Load metadata files
-allFiles = dir('data/metadata/*.mat');
+allFiles = dir('data/metadata/BeWise2012/*.mat');
 numberFiles = length(allFiles);
 
 % load all metadata files into allMetadata
@@ -26,8 +26,8 @@ merged.twt = allMetadata.metadata1.twt;
 % Merge coordinates, layers, ... 
 merged.psX = allMetadata.metadata1.psX;
 merged.psY = allMetadata.metadata1.psY;
-%merged.lon = allMetadata.metadata1.lon;
-%merged.lat = allMetadata.metadata1.lat;
+merged.lon = allMetadata.metadata1.lon;
+merged.lat = allMetadata.metadata1.lat;
 %merged.bottomBin = allMetadata.metadata1.bottom_bin;
 merged.bottomTwt = allMetadata.metadata1.bottom_twt;
 %merged.bottomRelSurfBin = allMetadata.metadata1.bottom_relto_surf_bin;
@@ -48,8 +48,8 @@ for kk = 2:numberFiles
     merged.operator{kk} = allMetadata.(currentName).operator;
     merged.psX = cat(2,merged.psX, allMetadata.(currentName).psX);
     merged.psY = cat(2,merged.psY, allMetadata.(currentName).psY);
-    %merged.lon = cat(2,merged.lon, allMetadata.(currentName).lon);
-    %merged.lat = cat(2,merged.lat, allMetadata.(currentName).lat);
+    merged.lon = cat(2,merged.lon, allMetadata.(currentName).lon);
+    merged.lat = cat(2,merged.lat, allMetadata.(currentName).lat);
     %merged.bottomBin = cat(2,merged.bottomBin, allMetadata.(currentName).bottom_bin);
     merged.bottomTwt = cat(2,merged.bottomTwt, allMetadata.(currentName).bottom_twt);
     %merged.bottomRelSurfBin = cat(2,merged.bottomRelSurfBin, allMetadata.(currentName).bottom_relto_surf_bin);
@@ -79,11 +79,11 @@ end
 
 % save bottom only if desired
 if save_bottom
-    namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
-    mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'bottomTwtRelToSurf', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
 else
-    namesVariables = {'psX', 'psY', 'surfaceTwt'};
-    mergedTable = table(merged.psX', merged.psY', merged.surfaceTwt', 'VariableNames', namesVariables);
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.surfaceTwt', 'VariableNames', namesVariables);
 end
 
 % save twt of layers first 
@@ -118,7 +118,7 @@ if save_qualities
 end
 
 % save table to file
-outputFileNameIRH = "/mergedLayer.txt";
+outputFileNameIRH = "/mergedLayer_BeWise.txt";
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
@@ -133,5 +133,5 @@ end
 
 infoCell = infoCell';
 
-outputFileNameBasics = "/mergedLayer_basics.txt";
+outputFileNameBasics = "/mergedLayer_BeWise_basics.txt";
 writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
