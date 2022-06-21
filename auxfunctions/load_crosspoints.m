@@ -6,6 +6,11 @@ function [metadata, cp_idx,cp_layers] = load_crosspoints(geoinfo, metadata, opt)
 
     for k = 1:opt.n_cross
         geoinfo_co = load(opt.filenames_cross{k}); % Loading the cross-over file
+        
+        if ~isfield(geoinfo_co,'version')
+            geoinfo_co = update_geoinfo(geoinfo_co);
+        end
+
         if ~isfield(geoinfo_co,'psX') % Check if polar stereographic coordinates not exist in file
             [geoinfo_co.psX,geoinfo_co.psY] = ll2ps(geoinfo_co.latitude,geoinfo_co.longitude); %convert to polar stereographic
         end
