@@ -4,7 +4,7 @@ function save_metadata(opt, geoinfo, metadata)
 
 %compute interruptions in layer for metadata
 for ii = 1:opt.nol
-    metadata.interruptions{ii} = compute_interruption(geoinfo.layers(ii,:));
+    metadata.interruptions(ii) = compute_interruption(geoinfo.layers(ii,:));
 end
 
 % save picked layers with bins and twt in metadata

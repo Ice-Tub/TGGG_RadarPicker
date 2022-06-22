@@ -56,7 +56,7 @@ end
 if ~sum(logArr) == 0
     interruption = strcat(string(numberOfInterruptions), ' interruption(s)');
 else
-    interruption = 'not picked';
+    interruption = "not picked";
 end
 
 end
