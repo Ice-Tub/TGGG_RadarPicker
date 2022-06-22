@@ -1,7 +1,11 @@
 clear 
 
+%% Set options
+save_qualities = 1;   % 0 if qualities should not be saved, 1 if qualities are saved
+save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
+
 %% Load metadata files
-allFiles = dir('data/metadata/*.mat');
+allFiles = dir('data/metadata/BeWise2012/*.mat');
 numberFiles = length(allFiles);
 
 % load all metadata files into allMetadata
@@ -22,15 +26,15 @@ merged.twt = allMetadata.metadata1.twt;
 % Merge coordinates, layers, ... 
 merged.psX = allMetadata.metadata1.psX;
 merged.psY = allMetadata.metadata1.psY;
-%merged.lon = allMetadata.metadata1.lon;
-%merged.lat = allMetadata.metadata1.lat;
+merged.lon = allMetadata.metadata1.lon;
+merged.lat = allMetadata.metadata1.lat;
 %merged.bottomBin = allMetadata.metadata1.bottom_bin;
 merged.bottomTwt = allMetadata.metadata1.bottom_twt;
 %merged.bottomRelSurfBin = allMetadata.metadata1.bottom_relto_surf_bin;
 merged.bottomRelSurfTwt = allMetadata.metadata1.bottom_relto_surf_twt;
 %.surfaceBin = allMetadata.metadata1.surface_bin;
 merged.surfaceTwt = allMetadata.metadata1.surface_twt;
-%merged.IRH_bin = allMetadata.metadata1.IRH_bin;d
+%merged.IRH_bin = allMetadata.metadata1.IRH_bin;
 merged.IRH_twt = allMetadata.metadata1.IRH_twt;
 %merged.IRH_RelSurfBin = allMetadata.metadata1.IRH_relto_surf_bin;
 merged.IRH_RelSurfTwt = allMetadata.metadata1.IRH_relto_surf_twt;
@@ -44,8 +48,8 @@ for kk = 2:numberFiles
     merged.operator{kk} = allMetadata.(currentName).operator;
     merged.psX = cat(2,merged.psX, allMetadata.(currentName).psX);
     merged.psY = cat(2,merged.psY, allMetadata.(currentName).psY);
-    %merged.lon = cat(2,merged.lon, allMetadata.(currentName).lon);
-    %merged.lat = cat(2,merged.lat, allMetadata.(currentName).lat);
+    merged.lon = cat(2,merged.lon, allMetadata.(currentName).lon);
+    merged.lat = cat(2,merged.lat, allMetadata.(currentName).lat);
     %merged.bottomBin = cat(2,merged.bottomBin, allMetadata.(currentName).bottom_bin);
     merged.bottomTwt = cat(2,merged.bottomTwt, allMetadata.(currentName).bottom_twt);
     %merged.bottomRelSurfBin = cat(2,merged.bottomRelSurfBin, allMetadata.(currentName).bottom_relto_surf_bin);
@@ -72,26 +76,53 @@ for ll = 1:numberLayers
 end
 
 %% Save merged struct into txt files
-namesVariables = {'psX', 'psY', 'bottomTwtRelToSurf', 'surfaceTwt'};
-mergedTable = table(merged.psX', merged.psY', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
 
+% save bottom only if desired
+if save_bottom
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'bottomTwtRelToSurf', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.bottomRelSurfTwt', merged.surfaceTwt', 'VariableNames', namesVariables);
+else
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'surfaceTwt'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.surfaceTwt', 'VariableNames', namesVariables);
+end
+
+% save twt of layers first 
 for nn = 1:numberLayers
     currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
-    currentQuality = append('qualityIRH', num2str(nn));
     %do not save layers if they are not picked
     if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
         continue
     end
-    currentTable = table(merged.(currentRelIRH), merged.(currentQuality), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn)), append('qualityIRH', num2str(nn))});
+    currentTable = table(merged.(currentRelIRH), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn))});
     mergedTable = [mergedTable currentTable];
 end
 
-outputFileNameIRH = "/mergedLayer.txt";
+% then save quality of layer (if desired)
+if save_qualities
+    for nn = 1:numberLayers
+        currentRelIRH = append('relToSurfTwtIRH', num2str(nn));
+        currentQuality = append('qualityIRH', num2str(nn));
+        
+        %do not save layers if they are not picked
+        if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
+            continue
+        end
+        % correction step for quality due to problem in old picker version
+        quality = merged.(currentQuality);
+        logInd = isnan(merged.(currentRelIRH));
+        quality(logInd) = NaN;
+
+        currentTable = table(quality, 'VariableNames', {append('qualityIRH', num2str(nn))});
+        mergedTable = [mergedTable currentTable];
+    end
+end
+
+% save table to file
+outputFileNameIRH = "/mergedLayer_BeWise.txt";
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
 infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('date: ', date)};
-
 
 
 for mm = 1:numberFiles
@@ -102,5 +133,5 @@ end
 
 infoCell = infoCell';
 
-outputFileNameBasics = "/mergedLayer_basics.txt";
-writecell(infoCell, append(pwd,'/data/metadata, outputFileNameBasics), 'delimiter', ' ')
+outputFileNameBasics = "/mergedLayer_BeWise_basics.txt";
+writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
