@@ -17,7 +17,7 @@ opt.input_folder = '/data/MCoRDS/20190106_02/';
 opt.input_file = 'TopoallData_20190106_02_003.mat';
 opt.output_folder = '/data/MCoRDS_picked_corrected';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = '06_02_003_withTwt'; % Define a suffix for the layerdata-file.
+opt.output_suffix = '06_02_003'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
@@ -48,6 +48,7 @@ opt.editing_window = 100;    % Number of traces that are updated in editing mode
 %%% Tuning parameters
 % For cutting the data
 tp.clms='all_clms';              % If an existing file is loaded, this option is overwritten.
+%tp.clms=[1:906 8544:9562];
 tp.rows=100:1000;                % cuts the radargram to limit processing (time) (top and bottom)
 
 % For surface and bottom pick
