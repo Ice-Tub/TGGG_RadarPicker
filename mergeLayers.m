@@ -5,16 +5,13 @@ save_qualities = 0;   % 0 if qualities should not be saved, 1 if qualities are s
 save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
 
 %% Set saving location etc. 
-loc_all_files = 'data/metadata/mergeMCoRDS/*.mat';
-outputFileNameBasics = "/mergedLayer_MCoRDS_basics.txt";
-outputFileNameIRH = "/mergedLayer_MCoRDS_IRH.txt";
+loc_all_files = 'data/metadata/06_02/*.mat';
+outputFileNameBasics = "/mergedLayer_MCoRDS_06_02_basics.txt";
+outputFileNameIRH = "/mergedLayer_MCoRDS_IRH_06_02.txt";
 
 %% Load metadata files
-<<<<<<< HEAD
 allFiles = dir('data/metadata/06_02/*.mat');
-=======
 allFiles = dir(loc_all_files);
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 numberFiles = length(allFiles);
 
 % load all metadata files into allMetadata
@@ -129,10 +126,7 @@ if save_qualities
 end
 
 % save table to file
-<<<<<<< HEAD
 outputFileNameIRH = "/mergedLayer.txt";
-=======
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
@@ -160,8 +154,5 @@ infoCell{end+1} = 'IRHx: two-way travel time of the IRH x in seconds from the su
 
 infoCell = infoCell';
 
-<<<<<<< HEAD
 outputFileNameBasics = "/mergedLayer_basics.txt";
-=======
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
