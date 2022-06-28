@@ -1,0 +1,6 @@
+Some fields in the LayerData and metadata .mat files should not be used for further analysis as they are outdated and not updated by the picker anymore. These fields are: 
+
+- layers_relto_surface
+- layers_topo
+- layers_topo_depth
+- pickingDates
