@@ -129,7 +129,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
 
     while get(ui_f2, 'UserData')
         if iteration == 1
-            layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'b-x');
+            layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'m-x');
             disp('Move and zoom if needed. Press enter to start picking.')
             pan on;
             pause(); % you can zoom with your mouse and when your image is okay, you press any key
@@ -198,9 +198,6 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
             qualities_old = geoinfo.qualities;
             geoinfo.layers(cl,:) = layer;
             geoinfo.qualities(cl,:) = quality;
-
-            % add date to metadata
-            metadata.pickingDates{cl} = date;
            
              
         end
@@ -208,7 +205,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         try
             delete(layerplot);
         end
-        layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'b-x');
+        layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'m-x');
     end
     
     %% Callback functions
