@@ -13,19 +13,9 @@ metadata.IRH_bin = geoinfo.layers;
 metadata.IRH_twt = geoinfo.layers .* dt;
 metadata.qualities = geoinfo.qualities;
 
-
-% check if old metadata exists and, if so, replace the dates of newly
-% picked layers
-if isfile(opt.file_metadata)
-    oldMetadata = load(opt.file_metadata);
-    for ii = 1:opt.nol
-        if ~strcmp(oldMetadata.pickingDates{ii}, 'not picked')
-            if strcmp(metadata.pickingDates{ii}, 'not picked')
-                metadata.pickingDates{ii} = oldMetadata.pickingDates{ii}; 
-            end
-        end
-    end  
-end
+% save row containing file_name for each trace
+metadata.filename = repmat({opt.input_file}, 1, size(metadata.IRH_bin,2));
+metadata.trace = 1:size(metadata.IRH_bin,2);
 
 save(opt.file_metadata, '-struct', 'metadata');
 

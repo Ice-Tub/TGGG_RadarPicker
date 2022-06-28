@@ -1,0 +1,10 @@
+Some fields in the LayerData and metadata .mat files should not be used for further analysis as they are outdated and not updated by the picker anymore. These fields are: 
+
+- layers_relto_surface
+- layers_topo
+- layers_topo_depth
+- pickingDates
+
+In order to load Data_20190106_02_006.mat instead of TopoData_20190106_02_006.mat a function in the picker needs to be created that calculates psX and psY (from lat and lon).
+
+Compute interruptions of merged layers. 
