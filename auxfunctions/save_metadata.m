@@ -13,6 +13,9 @@ metadata.IRH_bin = geoinfo.layers;
 metadata.IRH_twt = geoinfo.layers .* dt;
 metadata.qualities = geoinfo.qualities;
 
+% save row containing file_name for each trace
+metadata.filename = repmat({opt.input_file}, 1, size(metadata.IRH_bin,2));
+
 save(opt.file_metadata, '-struct', 'metadata');
 
 end
