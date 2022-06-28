@@ -6,3 +6,5 @@ Some fields in the LayerData and metadata .mat files should not be used for furt
 - pickingDates
 
 In order to load Data_20190106_02_006.mat instead of TopoData_20190106_02_006.mat a function in the picker needs to be created that calculates psX and psY (from lat and lon).
+
+Compute interruptions of merged layers. 
