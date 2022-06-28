@@ -15,9 +15,6 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
 
         layers               = NaN(opt.nol, geoinfo.num_trace);
         qualities            = NaN(opt.nol, geoinfo.num_trace);
-        layers_relto_surface = NaN(opt.nol, geoinfo.num_trace);
-        layers_topo          = NaN(opt.nol, geoinfo.num_trace);
-        layers_topo_depth    = NaN(opt.nol, geoinfo.num_trace);
 
         if isfield(geoinfo,'layers')
             nool = size(geoinfo.layers,1); % number of old layers
@@ -25,16 +22,10 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
 
             layers(1:noel,:) = geoinfo.layers(1:noel,:);
             qualities(1:noel,:) = geoinfo.qualities(1:noel,:);
-            layers_relto_surface(1:noel,:) = geoinfo.layers_relto_surface(1:noel,:);
-            layers_topo(1:noel,:) = geoinfo.layers_topo(1:noel,:);
-            layers_topo_depth(1:noel,:) = geoinfo.layers_topo_depth(1:noel,:);
         end
 
         geoinfo.layers = layers;
-        geoinfo.qualities = qualities;
-        geoinfo.layers_relto_surface = layers_relto_surface;
-        geoinfo.layers_topo = layers_topo;
-        geoinfo.layers_topo_depth = layers_topo_depth;    
+        geoinfo.qualities = qualities;   
 
         geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
         tp.rows = geoinfo.tp.rows;
