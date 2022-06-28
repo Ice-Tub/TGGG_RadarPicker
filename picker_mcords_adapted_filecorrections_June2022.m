@@ -21,7 +21,7 @@ opt.output_suffix = '06_02_003'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
-opt.picker = 'Leah Sophie Muhle';
+opt.picker = 'Inka Koch, Leah Sophie Muhle';
 opt.frequency = '150 – 520 MHz';
 opt.date = date;
 
