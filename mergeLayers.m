@@ -10,11 +10,8 @@ outputFileNameBasics = "/mergedLayer_MCoRDS_basics.txt";
 outputFileNameIRH = "/mergedLayer_MCoRDS_IRH.txt";
 
 %% Load metadata files
-<<<<<<< HEAD
-allFiles = dir('data/metadata/06_02/*.mat');
-=======
+
 allFiles = dir(loc_all_files);
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 numberFiles = length(allFiles);
 
 % load all metadata files into allMetadata
@@ -129,10 +126,6 @@ if save_qualities
 end
 
 % save table to file
-<<<<<<< HEAD
-outputFileNameIRH = "/mergedLayer.txt";
-=======
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
@@ -143,7 +136,9 @@ infoCell{end+1} = [];
 for mm = 1:numberFiles
     infoCell{end+1} = append('coordinator', num2str(mm),': ', merged.coordinator{mm});
     infoCell{end+1} = append('operator', num2str(mm),': ', merged.operator{mm});
-    infoCell{end+1} = append('original filename', num2str(mm), ': ');
+    currentData = append('metadata', num2str(mm));
+    currentFilename = char(allMetadata.(currentData).filename(1));
+    infoCell{end+1} = append('original filename', num2str(mm), ': ', currentFilename);
     infoCell{end+1} = append('acquisition date', num2str(mm), ': ');
     %infoCell{end+1} = [append("interruption", num2str(mm), ": "), merged.interruption(mm,:)];
     infoCell{end+1} = [];
@@ -160,8 +155,4 @@ infoCell{end+1} = 'IRHx: two-way travel time of the IRH x in seconds from the su
 
 infoCell = infoCell';
 
-<<<<<<< HEAD
-outputFileNameBasics = "/mergedLayer_basics.txt";
-=======
->>>>>>> 27479309589d7da7e4d674cd1b1d7c99ce9239c6
 writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
