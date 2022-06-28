@@ -1,7 +1,7 @@
 clear 
 
 %% Set options
-save_qualities = 1;   % 0 if qualities should not be saved, 1 if qualities are saved
+save_qualities = 0;   % 0 if qualities should not be saved, 1 if qualities are saved
 save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
 
 %% Set saving location etc. 
@@ -46,6 +46,7 @@ merged.IRH_RelSurfTwt = allMetadata.metadata1.IRH_relto_surf_twt;
 merged.qualities = allMetadata.metadata1.qualities;
 merged.interruption = allMetadata.metadata1.interruptions;
 merged.filename = allMetadata.metadata1.filename;
+merged.trace = allMetadata.metadata1.trace; 
 
 for kk = 2:numberFiles
     currentName = append('metadata', num2str(kk));
@@ -68,6 +69,7 @@ for kk = 2:numberFiles
     merged.qualities = cat(2,merged.qualities, allMetadata.(currentName).qualities);
     merged.interruption =  cat(1, merged.interruption, allMetadata.(currentName).interruptions);
     merged.filename = cat(2,merged.filename, allMetadata.(currentName).filename);
+    merged.trace = cat(2,merged.trace, allMetadata.(currentName).trace);
 end
 
 % split the IRH into the individual layers
@@ -84,11 +86,11 @@ end
 
 % save bottom only if desired
 if save_bottom
-    namesVariables = {'psX', 'psY', 'lon', 'lat', 'bottomTwtRelToSurf', 'surfaceTwt', 'filename'};
-    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.bottomRelSurfTwt', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'trace', 'base', 'surface', 'filename'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.trace', merged.bottomRelSurfTwt', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
 else
-    namesVariables = {'psX', 'psY', 'lon', 'lat', 'surfaceTwt', 'filename'};
-    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
+    namesVariables = {'psX', 'psY', 'lon', 'lat', 'trace', 'surface', 'filename'};
+    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.trace', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
 end
 
 % save twt of layers first 
@@ -98,7 +100,7 @@ for nn = 1:numberLayers
     if sum(isnan(merged.(currentRelIRH))) == length(merged.(currentRelIRH))
         continue
     end
-    currentTable = table(merged.(currentRelIRH), 'VariableNames', {append('relToSurfTwtIRH', num2str(nn))});
+    currentTable = table(merged.(currentRelIRH), 'VariableNames', {append('IRH', num2str(nn))});
     mergedTable = [mergedTable currentTable];
 end
 
@@ -126,14 +128,27 @@ end
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
-infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('date: ', date)};
+infoCell = {append('frequency: ', merged.frequency), append('radar type: ', merged.radarType), append('Picking date: ', date)};
 
+infoCell{end+1} = [];
 
 for mm = 1:numberFiles
     infoCell{end+1} = append('coordinator', num2str(mm),': ', merged.coordinator{mm});
     infoCell{end+1} = append('operator', num2str(mm),': ', merged.operator{mm});
-    infoCell{end+1} = [append("interruption", num2str(mm), ": "), merged.interruption(mm,:)];
+    infoCell{end+1} = append('original filename', num2str(mm), ': ');
+    infoCell{end+1} = append('acquisition date', num2str(mm), ': ');
+    %infoCell{end+1} = [append("interruption", num2str(mm), ": "), merged.interruption(mm,:)];
+    infoCell{end+1} = [];
 end
+
+infoCell{end+1} = 'Column headers are:';
+infoCell{end+1} = 'psX: x-coordinate in polar stereographic project 71 south';
+infoCell{end+1} = 'psY: y-coordinate in polar stereographic project 71 south';
+infoCell{end+1} = 'trace: trace number of the radar transect along-track';
+infoCell{end+1} = 'surface: two-way travel time of the surface (when applicable)';
+infoCell{end+1} = 'base: two-way travel time of the ice base in seconds from the surface';
+infoCell{end+1} = 'IRHx: two-way travel time of the IRH x in seconds from the surface';
+
 
 infoCell = infoCell';
 
