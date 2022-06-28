@@ -5,7 +5,7 @@ save_qualities = 1;   % 0 if qualities should not be saved, 1 if qualities are s
 save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
 
 %% Load metadata files
-allFiles = dir('data/metadata/BeWise2012/*.mat');
+allFiles = dir('data/metadata/06_02/*.mat');
 numberFiles = length(allFiles);
 
 % load all metadata files into allMetadata
@@ -118,7 +118,7 @@ if save_qualities
 end
 
 % save table to file
-outputFileNameIRH = "/mergedLayer_BeWise.txt";
+outputFileNameIRH = "/mergedLayer.txt";
 writetable(mergedTable, append(pwd,'/data/metadata/txtfiles', outputFileNameIRH), 'delimiter', ',')
 
 % write remaining info to extra file
@@ -133,5 +133,5 @@ end
 
 infoCell = infoCell';
 
-outputFileNameBasics = "/mergedLayer_BeWise_basics.txt";
+outputFileNameBasics = "/mergedLayer_basics.txt";
 writecell(infoCell, append(pwd,'/data/metadata/txtfiles', outputFileNameBasics), 'delimiter', ' ')
