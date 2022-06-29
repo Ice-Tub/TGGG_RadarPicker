@@ -87,11 +87,11 @@ end
 
 % save bottom only if desired
 if save_bottom
-    namesVariables = {'psX', 'psY', 'lon', 'lat', 'trace', 'base', 'surface', 'filename'};
-    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.trace', merged.bottomRelSurfTwt', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
+    namesVariables = {'lon', 'lat', 'psX', 'psY',  'trace', 'filename', 'surface', 'base'};
+    mergedTable = table(merged.lon', merged.lat', merged.psX', merged.psY', merged.trace', merged.filename',merged.surfaceTwt', merged.bottomRelSurfTwt',  'VariableNames', namesVariables);
 else
-    namesVariables = {'psX', 'psY', 'lon', 'lat', 'trace', 'surface', 'filename'};
-    mergedTable = table(merged.psX', merged.psY', merged.lon', merged.lat', merged.trace', merged.surfaceTwt', merged.filename', 'VariableNames', namesVariables);
+    namesVariables = {'lon', 'lat', 'psX', 'psY', 'trace', 'filename', 'surface'};
+    mergedTable = table(merged.lon', merged.lat', merged.psX', merged.psY',  merged.trace', merged.filename',merged.surfaceTwt', 'VariableNames', namesVariables);
 end
 
 % save twt of layers first 
@@ -145,8 +145,10 @@ for mm = 1:numberFiles
 end
 
 infoCell{end+1} = 'Column headers are:';
-infoCell{end+1} = 'psX: x-coordinate in polar stereographic project 71 south';
-infoCell{end+1} = 'psY: y-coordinate in polar stereographic project 71 south';
+infoCell{end+1} = 'lon: x-coordinate in decimal degrees';
+infoCell{end+1} = 'lat: y-coordinate in decimal degrees';
+infoCell{end+1} = 'psX: x-coordinate in polar stereographic project 71 south (EPSG:3031)';
+infoCell{end+1} = 'psY: y-coordinate in polar stereographic project 71 south (EPSG:3031)';
 infoCell{end+1} = 'trace: trace number of the radar transect along-track';
 infoCell{end+1} = 'surface: two-way travel time of the surface (when applicable)';
 infoCell{end+1} = 'base: two-way travel time of the ice base in seconds from the surface';
