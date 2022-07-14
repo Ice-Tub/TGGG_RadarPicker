@@ -13,17 +13,23 @@ close all;
 % Working settings
 % Data
 opt.input_type = 'MCoRDS'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
-opt.input_folder = '/data/MCoRDS/20190106_02/';
-opt.input_file = 'TopoallData_20190106_02_00.mat';
-opt.output_folder = '/data/MCoRDS_picked_corrected';
+opt.input_folder = '/data/data_awi_flightlines/';
+opt.input_file = 'TopoData_20190106_02_003.mat';
+opt.output_folder = '/data/picked_data/data_awi_flightlines';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = '06_02_006'; % Define a suffix for the layerdata-file.
+opt.output_suffix = '06_02_003'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
-opt.picker = 'Inka Koch, Leah Sophie Muhle';
-opt.frequency = '150 - 520 MHz';
-opt.date = date;
+opt.picker = 'Leah Sophie Muhle';
+opt.frequency = '5 MHz';
+opt.acquisition_day = 06;
+opt.acquisition_month = 01;
+opt.acquisition_year = 2019;
+opt.survey_number = 2;
+opt.profile_number = 3;
+
+opt.picking_date = datetime('today');
 
 
 % Options
@@ -53,7 +59,7 @@ tp.rows=100:1000;                % cuts the radargram to limit processing (time)
 % For surface and bottom pick
 tp.MinBinForSurfacePick = 10; % when already preselected, this can be small
 tp.smooth_sur=40;             % between 30 and 60 seems to be good
-tp.MinBinForBottomPick = 1000;
+tp.MinBinForBottomPick = 800;
 tp.MaxBinForBottomPick = 6000;
 tp.num_bottom_peaks = 8;      % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 

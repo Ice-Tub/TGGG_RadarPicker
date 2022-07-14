@@ -10,8 +10,8 @@ metadata.psY = geoinfo.psY;
 metadata.twt = geoinfo.twt;
 metadata.frequency = opt.frequency;
 metadata.crossover = {};
-metadata.pickingDates(1:opt.nol) = {'not picked'};
-metadata.interruptions(1:opt.nol) = "not picked";
+%metadata.pickingDates(1:opt.nol) = {'not picked'};
+%metadata.interruptions(1:opt.nol) = "not picked";
 
 if strcmp(opt.input_type, 'GPR_LF')
     metadata.radarType = 'Ground-based dipole antennae';

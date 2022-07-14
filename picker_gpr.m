@@ -14,22 +14,27 @@ close all;
 % Data
 opt.input_type = 'GPR_LF'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
 opt.input_folder = '/data/GPR_LF_data/Belare2010/GPR_LF/';
-opt.input_file = 'data20101212_gl_lv1';
-opt.output_folder = '/data/picked_data';
+opt.input_file = 'data20101214_lv1';
+opt.output_folder = '/data/picked_data/Belare2010';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = 'data20101212_gl_lv1'; % Define a suffix for the layerdata-file.
+opt.output_suffix = 'data20101214_lv1'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
 opt.picker = 'Leah Sophie Muhle';
 opt.frequency = '5 MHz';
-opt.date = date;
+opt.picking_date = datetime('today');
+opt.acquisition_day = 14;
+opt.acquisition_month = 12;
+opt.acquisition_year = 2010;
+opt.survey_number = 1;
+opt.profile_number = 'lv1';
 
 
 % Options
 % The following options can be activated by setting: 1 = yes, 0 = no.
-opt.create_new_geoinfo = 1; % CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
-opt.update_bottom = 1;      % Update bottom, when old geoinfo is loaded.
+opt.create_new_geoinfo = 0; % CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
+opt.update_bottom = 0;      % Update bottom, when old geoinfo is loaded.
 opt.update_seeds = 1;       % This option can be used to update seeds only, if bottom is updated or a new geoinfo is created, the seeds will be computed in any case.
 opt.keep_old_picks = 1;     % Keep old picks, when old geoinfo is loaded.
 opt.load_crossover = 1;     % Activate loading cross-over points.
@@ -54,7 +59,7 @@ tp.rows=1:1000;                % cuts the radargram to limit processing (time) (
 tp.MinBinForSurfacePick = 10; % when already preselected, this can be small
 tp.smooth_sur=40;             % between 30 and 60 seems to be good
 tp.MinBinForBottomPick = 200;
-tp.MaxBinForBottomPick = 950;
+tp.MaxBinForBottomPick = 700;
 tp.num_bottom_peaks = 3;      % Number of strongest peaks considered as bottom pick. 10 is a good guess.
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 
 
