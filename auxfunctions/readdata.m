@@ -90,7 +90,20 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         psY = input.y;
         elevation_sur = input.z;
         time_gps = NaN(size(data,2), 1);
+
+    elseif strcmp(inputtype, 'pulsEKKO')
         
+        data = input.data;
+        twt = input.travel_time';
+        twt_sur = NaN(length(input.lat));
+        twt_bot = NaN(length(input.lat));
+        lat = input.lat;
+        lon = input.long;
+        psX = input.x_coord;
+        psY = input.y_coord;
+        elevation_sur = input.elev;
+        time_gps = NaN(size(data,2), 1);
+                
     else
         disp(append("Inputfile type '", inputtype ,"' is unknown."))
     end
