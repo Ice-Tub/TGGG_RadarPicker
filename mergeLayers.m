@@ -5,9 +5,9 @@ save_qualities = 0;   % 0 if qualities should not be saved, 1 if qualities are s
 save_bottom = 1;        % 0 if bottom twt should not be saved, 1 otherwise
 
 %% Set saving location etc. 
-loc_all_files = 'data/metadata/BeWise2012/*.mat';
-outputFileNameBasics = "/mergedLayer_GPR_LF_Bewise2012_basics.txt";
-outputFileNameIRH = "/mergedLayer_GPR_LF_Bewise2012.txt";
+loc_all_files = 'data/metadata/BeWise2012/*.mat'; %merges all .mat files in this directory, sorting them by file name/number
+outputFileNameBasics = "/BeWise2012_basics.txt";
+outputFileNameIRH = "/BeWise2012.txt";
 
 %% Load metadata files
 

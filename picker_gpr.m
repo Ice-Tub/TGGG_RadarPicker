@@ -13,22 +13,22 @@ close all;
 % Working settings
 % Data
 opt.input_type = 'GPR_LF'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
-opt.input_folder = '/data/GPR_LF_data/Belare2010/GPR_LF/';
-opt.input_file = 'data20101214_lv1';
-opt.output_folder = '/data/picked_data/Belare2010';
+opt.input_folder = '/data/Belare2010/';
+opt.input_file = 'data20101213_lv1';
+opt.output_folder = '/data/Belare2010/GPR_LF/bed_corrected/';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = 'data20101214_lv1'; % Define a suffix for the layerdata-file.
+opt.output_suffix = 'data20101213_lv1'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
-opt.picker = 'Leah Sophie Muhle';
+opt.picker = 'Leah Sophie Muhle, Inka Koch';
 opt.frequency = '5 MHz';
 opt.picking_date = datetime('today');
-opt.acquisition_day = 14;
+opt.acquisition_day = 13;
 opt.acquisition_month = 12;
 opt.acquisition_year = 2010;
-opt.survey_number = 1;
-opt.profile_number = 'lv1';
+opt.survey_number = 2;
+opt.profile_number = 1; % needs to be a number
 
 
 % Options

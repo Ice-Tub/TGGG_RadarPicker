@@ -13,11 +13,11 @@ close all;
 % Working settings
 % Data
 opt.input_type = 'MCoRDS'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
-opt.input_folder = '/data/MCoRDS/20190106_02/600m_max/';
-opt.input_file = 'TopoData_20190106_02_002.mat';
+opt.input_folder = '/data/MCoRDS/20190107_01/';
+opt.input_file = 'TopoallData_20190107_01_002.mat';
 opt.output_folder = '/data/MCoRDS_picked_corrected/picked_bedCorrected/';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = '06_02_002'; % Define a suffix for the layerdata-file.
+opt.output_suffix = '07_01_002'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';

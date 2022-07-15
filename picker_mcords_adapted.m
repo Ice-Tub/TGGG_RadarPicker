@@ -13,21 +13,21 @@ close all;
 % Working settings
 % Data
 opt.input_type = 'MCoRDS'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
-opt.input_folder = '/data/data_awi_flightlines/';
-opt.input_file = 'TopoData_20190106_02_003.mat';
-opt.output_folder = '/data/picked_data/data_awi_flightlines';
+opt.input_folder = '/data/MCoRDS/20190107_01/';
+opt.input_file = 'TopoallData_20190107_01_010.mat';
+opt.output_folder = '/data/MCoRDS_picked_corrected';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = '06_02_003'; % Define a suffix for the layerdata-file.
-opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
+opt.output_suffix = '07_01_010'; % Define a suffix for the layerdata-file.
+opt.file_metadata = strcat(pwd,'/data/metadata/07_01/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
-opt.picker = 'Leah Sophie Muhle';
-opt.frequency = '5 MHz';
-opt.acquisition_day = 06;
+opt.picker = 'Inka Koch, Leah Sophie Muhle';
+opt.frequency = '150 – 520 MHz';
+opt.acquisition_day = 07;
 opt.acquisition_month = 01;
 opt.acquisition_year = 2019;
-opt.survey_number = 2;
-opt.profile_number = 3;
+opt.survey_number = 1;
+opt.profile_number = 10; % needs to be a number
 
 opt.picking_date = datetime('today');
 
