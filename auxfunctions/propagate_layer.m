@@ -28,7 +28,7 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
             if strcmpi(opt.input_type, 'MCoRDS')
                 [~,lind,~,p] = findpeaks(mag2db(geoinfo.data(current_window,x_trace))); % need to do this on the bare data.
                 
-            elseif strcmpi(opt.input_type, 'GPR_LF') || strcmpi(opt.input_type, 'GPR_HF') || strcmpi(opt.input_type, 'awi_flight')
+            elseif strcmpi(opt.input_type, 'GPR_LF') || strcmpi(opt.input_type, 'GPR_HF') || strcmpi(opt.input_type, 'awi_flight') || strcmpi(opt.input_type, 'PulsEKKO')
                 
                 % layer is propagated either by direct intensity extrema or
                 % median intensity extrema

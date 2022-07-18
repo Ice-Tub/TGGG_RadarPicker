@@ -17,6 +17,8 @@ if strcmp(opt.input_type, 'GPR_LF')
     metadata.radarType = 'Ground-based dipole antennae';
 elseif strcmp(opt.input_type, 'MCoRDS')
     metadata.radarType = 'airborne MCoRDS';
+elseif strcmp(opt.input_type, 'PulsEKKO')
+    metadata.radarType = 'PulsEKKO GPR';
 end
 
 end

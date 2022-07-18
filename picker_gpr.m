@@ -12,23 +12,23 @@ close all;
 
 % Working settings
 % Data
-opt.input_type = 'GPR_LF'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight'
-opt.input_folder = '/data/Belare2010/';
-opt.input_file = 'data20101213_lv1';
-opt.output_folder = '/data/Belare2010/GPR_LF/bed_corrected/';
+opt.input_type = 'PulsEKKO'; %Inputfile-type, options: 'GPR_LF', 'MCoRDS', 'GPR_HF', 'awi_flight', 'PulsEKKO'
+opt.input_folder = '/data/PulsEKKO/';
+opt.input_file = 'AlongFlow2';
+opt.output_folder = '/data/picked_data/PulsEKKO/';
 opt.output_prefix = '/LayerData_'; % Define a prefix for the layerdata-file. (output_file = prefix + suffix)
-opt.output_suffix = 'data20101213_lv1'; % Define a suffix for the layerdata-file.
+opt.output_suffix = 'AlongFlow2'; % Define a suffix for the layerdata-file.
 opt.file_metadata = strcat(pwd,'/data/metadata/',opt.output_suffix,'_metadata.mat');
 opt.cross_section = 'all'; % Options : List of numbers (e.g.:{'001'; '002'}) or all files in output_folder('all'). Some already pick section to find cross-points.
 opt.coordinator = 'Reinhard Drews';
 opt.picker = 'Leah Sophie Muhle, Inka Koch';
 opt.frequency = '5 MHz';
 opt.picking_date = datetime('today');
-opt.acquisition_day = 13;
-opt.acquisition_month = 12;
-opt.acquisition_year = 2010;
-opt.survey_number = 2;
-opt.profile_number = 1; % needs to be a number
+opt.acquisition_day = NaN;
+opt.acquisition_month = NaN;
+opt.acquisition_year = NaN;
+opt.survey_number = NaN;
+opt.profile_number = NaN; % needs to be a number
 
 
 % Options
@@ -53,7 +53,7 @@ opt.editing_window = 10;    % Number of traces that are updated in editing mode.
 %%% Tuning parameters
 % For cutting the data
 tp.clms='all_clms';              % If an existing file is loaded, this option is overwritten.
-tp.rows=1:1000;                % cuts the radargram to limit processing (time) (top and bottom)
+tp.rows=1:4000;                % cuts the radargram to limit processing (time) (top and bottom)
 
 % For surface and bottom pick
 tp.MinBinForSurfacePick = 10; % when already preselected, this can be small
@@ -64,7 +64,7 @@ tp.num_bottom_peaks = 3;      % Number of strongest peaks considered as bottom p
 tp.smooth_bot = 1;              % Smoothing for bottom pick. No smoothing for smooth_bot 
 
 % For computation of seeds (Only possible for MCoRDS-data)
-tp.window = 5;                  %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
+tp.window = 9;                  %vertical window, keep small to avoid jumping. Even numbers work as next odd number.
 tp.seedthresh = 5;              % 5 seems to work ok, make bigger to have less, set 0 to take all (but then the line jumps automatically...)
 
 %wavelet parameters
@@ -74,7 +74,7 @@ tp.bgSkip = 150;              %decide how many pixels below bed layer is counted
 tp.RefHeight = 300;             %set the maximum height for topo correction of echogram, extended to 5000 since I got an error in some profiles
 
 % Other Parameters
-tp.nopeaks_window = 10;       % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
+tp.nopeaks_window = 5;       % gives the number of traces over which the direction of layer propagation will be averaged for propagate_layer in case of no peak 
 tp.weight_factor = 2;         % states how much the previous direction of layer propagation is weighted in comparison to peak prominence in propagate_layer 
 tp.ice_velocity = 1.68e8;     % ice velocity used for topographical correction
 %%
