@@ -30,18 +30,19 @@ hold on
 if ~strcmpi(opt.input_type, 'GPR_HF')
 
     % Include and update surface and bottom picks
-    updatePlotMinPeaks = 1;
-    updatePlotMax = 1;
+%     updatePlotMinPeaks = 1;
+%     updatePlotMax = 1;
+    updatePlot = 1;
     manual_MBFBP = 0;
-    manualLowerBottom = 0;
+    manualMaxBottom = 0;
     MinBinBottom = ones(1,geoinfo.num_trace) * tp.MinBinForBottomPick;
     MaxBinBottom = ones(1,geoinfo.num_trace) * min(tp.MaxBinForBottomPick, length(tp.rows));
     dt=geoinfo.twt(2)-geoinfo.twt(1);
     t1=geoinfo.twt(1);
 
+    while updatePlot 
 
-    while updatePlotMax
-        if manualLowerBottom
+        if manualMaxBottom
             disp('Pick a variable MaxBinForBottomPick.')
             [x,y,~]=ginput(); %gathers points until return
 
@@ -57,24 +58,6 @@ if ~strcmpi(opt.input_type, 'GPR_HF')
             end
         end
 
-        if opt.update_bottom
-            % Define MaxBinForBottomPick manually
-            prompt = {'Pick MaxBinForBottomPick manually (1=yes, 0=no):'};
-            dlgtitle = 'Update maximum bottom pick?';
-            dims = [1 35];
-            definput = {'0'};
-            answer = inputdlg(prompt,dlgtitle,dims,definput);
-            updatePlotMax = ~isempty(answer);
-            if updatePlotMax
-                manualLowerBottom = str2double(answer{1});
-                disp('Processing new bottom pick...')
-            end
-        else
-            updatePlotMax = 0;
-        end  
-    end
-
-    while updatePlotMinPeaks
         if manual_MBFBP
             disp('Pick a variable MinBinForBottomPick.')
             [x,y,~]=ginput(); %gathers points until return
@@ -97,7 +80,7 @@ if ~strcmpi(opt.input_type, 'GPR_HF')
             geoinfo = pick_surface(geoinfo,tp,opt);
             geoinfo = pick_bottom(geoinfo,tp,opt,MinBinBottom,MaxBinBottom);
         end
-       
+
         % Delete existing surface and bottom pick
         if exist('botplot','var')
             delete(surplot);
@@ -117,7 +100,6 @@ if ~strcmpi(opt.input_type, 'GPR_HF')
         hold on
         maxplot = plot(tp.clms,MaxBinBottomPlot, 'k--');
         hold on
-        %set(gcf,'doublebuffer','on');
 
         if opt.update_bottom
 
@@ -125,20 +107,23 @@ if ~strcmpi(opt.input_type, 'GPR_HF')
             % manually
             disp('Show surface and bottom picks.')
 
-            prompt = {'Number of bottom peaks:','Pick MinBinForBottomPick manually (1=yes, 0=no):'};
-            dlgtitle = 'Update minimum bottom pick?';
+            prompt = {'Number of bottom peaks:','Pick MinBinForBottomPick manually (1=yes, 0=no):', 'Pick MaxBinForBottomPick manually (1=yes, 0=no):'};
+            dlgtitle = 'Update minimum and/or maximum bottom pick?';
             dims = [1 35];
-            definput = {int2str(tp.num_bottom_peaks),'0'};
+            definput = {int2str(tp.num_bottom_peaks),'0', '0'};
             answer = inputdlg(prompt,dlgtitle,dims,definput);
-            updatePlotMinPeaks = ~isempty(answer);
-            if updatePlotMinPeaks
+            updatePlot = ~isempty(answer);
+            if updatePlot
                 tp.num_bottom_peaks = str2double(answer{1});
                 manual_MBFBP = str2double(answer{2});
+                manualMaxBottom = str2double(answer{3});
                 disp('Processing new bottom pick...')
             end
         else
-            updatePlotMinPeaks = 0;
+            updatePlot= 0;
         end
+
+        
     end
 
 
