@@ -5,7 +5,7 @@ function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
     
         if strcmpi(opt.input_type, 'MCoRDS')
             data_scaled = mag2db(geoinfo.data);
-        elseif strcmpi(opt.input_type, 'GPR_LF')
+        elseif strcmpi(opt.input_type, 'GPR_LF') || strcmpi(opt.input_type, 'PulsEKKO')
             data_scaled = geoinfo.data;
         end
 

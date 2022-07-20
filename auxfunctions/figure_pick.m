@@ -27,6 +27,9 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     elseif strcmpi(opt.input_type, 'awi_flight')
         data_scaled = geoinfo.data./max(geoinfo.data(:));
         slider_step = [1/1000, 1/100];
+    elseif strcmpi(opt.input_type, 'PulsEKKO')
+        data_scaled = geoinfo.data./max(geoinfo.data(:));
+        slider_step = [1/1000, 1/100];
     end
     
     %% Plot radar data
@@ -38,6 +41,10 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         imagesc(data_scaled)
         colormap(opt.cmp)
         caxis([-0.04 0.06])
+%     elseif strcmpi(opt.input_type, 'PulsEKKO')
+%         imagesc(data_scaled)
+%         colormap(opt.cmp)
+%         caxis([-0.1, 2])
     else
         imagesc(data_scaled);
         colormap(opt.cmp)

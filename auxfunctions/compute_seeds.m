@@ -16,7 +16,7 @@ if strcmpi(opt.input_type, 'MCoRDS')
     geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; %
 
     clear peakim imAmp ysrf ybtm echogram scales
-elseif strcmpi(opt.input_type, 'GPR_LF')
+elseif strcmpi(opt.input_type, 'GPR_LF') || strcmpi(opt.input_type, 'PulsEKKO')
     geoinfo.peakim =  zeros(size(geoinfo.data));
 end
 end

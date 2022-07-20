@@ -91,9 +91,9 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         elevation_sur = input.z;
         time_gps = NaN(size(data,2), 1);
 
-    elseif strcmp(inputtype, 'pulsEKKO')
+    elseif strcmp(inputtype, 'PulsEKKO')
         
-        data = input.data;
+        data = movmedian(input.data, 5, 2);
         twt = input.travel_time';
         twt_sur = NaN(length(input.lat));
         twt_bot = NaN(length(input.lat));

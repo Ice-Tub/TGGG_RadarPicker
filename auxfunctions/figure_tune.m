@@ -17,6 +17,10 @@ elseif strcmpi(opt.input_type, 'awi_flight')
     norm_geo = geoinfo.data./max(geoinfo.data(:));
     imagesc(tp.clms, tp.rows, norm_geo)
     caxis([-0.04 0.06])
+elseif strcmpi(opt.input_type, 'PulsEKKO')
+    norm_geo = geoinfo.data/max(geoinfo.data(:));
+    imagesc(tp.clms, geoinfo.twt, norm_geo)
+    caxis([-0.1, 0.3])
 end
 colormap(bone)
 colorbar
