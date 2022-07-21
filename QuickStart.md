@@ -18,4 +18,8 @@
 
 **Options:**
 
+The following options can be activated by setting them to 1 and deactivated by setting them to 0. 
+
+* *create_new_g
+
 
