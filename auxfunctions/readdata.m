@@ -93,7 +93,7 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
 
     elseif strcmp(inputtype, 'PulsEKKO')
         
-        data = movmedian(input.data, 5, 2);
+        data = input.data;
         twt = input.travel_time';
         twt_sur = NaN(length(input.lat));
         twt_bot = NaN(length(input.lat));
