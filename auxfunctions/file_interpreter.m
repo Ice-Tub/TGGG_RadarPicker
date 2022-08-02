@@ -8,6 +8,13 @@ function [opt] = file_interpreter(opt)
         opt.output_suffix = append(opt.output_suffix, '.mat');
     end
     
+    if strcmp(opt.input_folder(1),'/') || strcmp(opt.input_folder(1),'\')
+        opt.input_folder = opt.input_folder(2:end);
+    end
+    if strcmp(opt.output_folder(1),'/') || strcmp(opt.output_folder(1),'\')
+        opt.output_folder = opt.output_folder(2:end);
+    end 
+    
     % Get full input filename (Not needed if geoinfo file already exists)
     input_path = dir(fullfile(opt.input_folder, opt.input_file)); % Obtain abolute path and file name, independent of 'opt.input_folder' being an absolute or relative path.
     opt.filename_input_data = fullfile(input_path.folder, input_path.name); % Get the full input file name.
