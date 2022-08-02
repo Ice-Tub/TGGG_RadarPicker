@@ -95,7 +95,7 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         
         data = input.data;
         twt = input.travel_time';
-        twt_sur = NaN(length(input.lat));
+        twt_sur = zeros(length(input.lat));
         twt_bot = NaN(length(input.lat));
         lat = input.lat;
         lon = input.long;
