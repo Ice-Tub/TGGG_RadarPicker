@@ -22,8 +22,12 @@ function [opt] = file_interpreter(opt)
     % Get full output filename
     output_file = append(opt.output_prefix, opt.output_suffix); % Merge output prefix and suffix
     output_path = dir(fullfile(opt.output_folder, output_file)); % Obtain abolute path and file name, independent of 'opt.output_folder' being an absolute or relative path.
-    opt.filename_geoinfo = fullfile(output_path.folder, output_path.name); % Get the full output file name.
-    
+    if ~isempty(output_path)
+        opt.filename_geoinfo = fullfile(output_path.folder, output_path.name); % Get the full output file name.
+    else 
+        opt.filename_geoinfo = fullfile(opt.output_folder, output_file); % Cannot obtain absolute path yet, as file does not exist.
+    end
+        
     if opt.load_crossover
         filenames_cross = {};
         if strcmp(opt.cross_section,'all')
