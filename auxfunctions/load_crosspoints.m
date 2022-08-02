@@ -55,7 +55,7 @@ function [metadata, cp_idx,cp_layers] = load_crosspoints(geoinfo, metadata, opt)
                     geoinfo_layers_ind(1:ncp) = (geoinfo.time_pick_abs/dt)+geoinfo_co_layers_ind(1:ncp);                   
                 end
             end
-            if any(cp_layers)
+            if any(cp_layers, 'all')
                 cp_idx = [cp_idx, geoinfo_idx];
                 cp_layers = [cp_layers, geoinfo_layers_ind];
             elseif exist('geoinfo_layers_ind', 'var')
