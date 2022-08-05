@@ -86,6 +86,10 @@ If you misclick and overwrite or delete you previously picked layer, you can und
 You can save the current picks by pressing 'Save picks'.
 You can finish picking by pressing 'End picking', this will also save you current picks. (This does not work smoothly. To finally leave the picking-loop, you need to click on the radargram and press enter. If problems still occur here, you can force the picker to terminate with pressing STRG+C after saving the picks.).
 
+## How does the picker pick laayers?
+
+The internal layers present themselves as intensity maxima or minima, respectively, in the radargram. After chosing an initial point of a layer, the picker will look for intensity extrema in a small window of the adjacent trace (either to the left or the right). Depending on the settings, one of the extrema (in case there is one), will be chosen as the position where the layer propagates. This process is repeated until a continuous layer is picked across the radargram. However, this approach is very prone to errors and does not recognize areas, where the layer is interrupted. Hence, manual correction by clicking is required.    
+
 
 
 
