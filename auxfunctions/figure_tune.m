@@ -3,7 +3,7 @@ function [geoinfo, tp] = figure_tune(geoinfo,tp,opt)
 %   Detailed explanation goes here
 
 % Create background plot.
-f1 = figure(1);
+f1 = figure();
 
 if strcmpi(opt.input_type, 'MCoRDS')
     imagesc(tp.clms,geoinfo.twt,(mag2db(geoinfo.data)));

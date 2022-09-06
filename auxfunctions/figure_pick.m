@@ -35,7 +35,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     %% Plot radar data
     [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
     
-    f = figure(2); % of flat data with seed points
+    f = figure(); % of flat data with seed points
     
     if strcmpi(opt.input_type, 'awi_flight')
         imagesc(data_scaled)
