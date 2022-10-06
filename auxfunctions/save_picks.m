@@ -66,14 +66,8 @@ function save_picks(geoinfo,metadata,tp,opt)
         
         geoinfo.num_layer = sum(max(~isnan(geoinfo.layers),[],2));
         geoinfo.tp = tp;
-
-       
         
         save(opt.filename_geoinfo, '-struct', 'geoinfo');
         save_metadata(opt, geoinfo, metadata)
-
-        geoinfo.data_org = geoinfo.data;
-        data_mean = mean(geoinfo.data_org,2);
-        geoinfo.data = geoinfo.data_org-data_mean;
 end
 
