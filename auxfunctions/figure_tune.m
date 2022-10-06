@@ -1,5 +1,5 @@
 function [geoinfo, tp] = figure_tune(geoinfo,tp,opt)
-%FIGURE_TUNE displays the function for surface and bottom picking.
+%FIGURE_TUNE displays the radargram for surface and bottom picking.
 %   Detailed explanation goes here
 
 % Create background plot.

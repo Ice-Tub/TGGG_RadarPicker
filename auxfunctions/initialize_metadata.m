@@ -1,6 +1,8 @@
-function [metadata] = initialize_metadata(geoinfo, opt)
+function metadata = initialize_metadata(geoinfo, opt)
 %CREATE_METADATA Summary of this function goes here
 %   Detailed explanation goes here
+
+% ToDo: Improve commentation of this function
 metadata.coordinator = opt.coordinator;
 metadata.operator = opt.picker;
 metadata.lat = geoinfo.lat;

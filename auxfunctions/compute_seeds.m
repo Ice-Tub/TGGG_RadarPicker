@@ -5,6 +5,7 @@ if ~isfield(opt,'update_seeds')
     opt.update_seeds = 0;
 end
 
+% ToDo: Enable seed point calculation for other radar types than MCoRDS
 if strcmpi(opt.input_type, 'MCoRDS')
     minscales=3;
     scales = minscales:tp.maxwavelet; % definition from ARESELP

@@ -37,6 +37,7 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         geoinfo = update_geoinfo(geoinfo);
     end
     
+    % ToDo: Reorganize very specific options such as delete_stripes
     if opt.delete_stripes
         geoinfo.data_org = geoinfo.data;
         data_mean = mean(geoinfo.data_org,2);
