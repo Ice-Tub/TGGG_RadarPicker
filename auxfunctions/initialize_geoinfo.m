@@ -33,8 +33,15 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks;
     end
 
+    % Version numbers
+    % 1: Initial picker version used for Inka's paper
+    % 1.1: Include manual bed picker and ind variables
+    
+    current_version = 1.1;
     if ~isfield(geoinfo,'version')
-        geoinfo = update_geoinfo(geoinfo);
+        geoinfo = update_geoinfo(geoinfo, current_version);
+    elseif geoinfo.version < current_version
+        geoinfo = update_geoinfo(geoinfo, current_version);
     end
     
     % ToDo: Reorganize very specific options such as delete_stripes

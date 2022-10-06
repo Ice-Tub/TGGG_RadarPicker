@@ -1,7 +1,7 @@
-function geoinfo = update_geoinfo(geoinfo)
+function geoinfo = update_geoinfo(geoinfo, current_version)
 %%
 % ToDo: Include option 'append'
-%%
+%% Rename fields with depracted names.
 if isfield(geoinfo,'echogram')
     geoinfo.data = geoinfo.echogram;
     geoinfo = rmfield(geoinfo,'echogram');
@@ -50,5 +50,15 @@ if isfield(geoinfo,'time_pick_abs')
     geoinfo = rmfield(geoinfo,'time_pick_abs');
 end
 
-geoinfo.version = 1;
+%% Include missing fields
+if ~isfield(geoinfo,'ind')
+    geoinfo.ind = 1:length(geoinfo.twt);
+    geoinfo.ind_sur = mod(find(geoinfo.twt_sur == geoinfo.twt), length(geoinfo.twt))';
+    geoinfo.ind_bot = mod(find(geoinfo.twt_bot == geoinfo.twt), length(geoinfo.twt))';
+    if isempty(geoinfo.ind_bot)
+        geoinfo.ind_bot = NaN(1, length(geoinfo.lat));
+    end 
+end
+
+geoinfo.version = current_version;
 end
