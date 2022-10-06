@@ -34,7 +34,10 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         geoinfo.layers = layers;
         geoinfo.qualities = qualities;   
 
-        geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
+        if isfield(geoinfo,'peakim')
+            geoinfo.peakim(geoinfo.peakim<tp.seedthresh) = 0; % Only needed for old data files
+        end
+        
         tp.rows = geoinfo.tp.rows;
         tp.clms = geoinfo.tp.clms;
         tp.num_bottom_peaks = geoinfo.tp.num_bottom_peaks;
@@ -57,9 +60,5 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         data_mean = mean(geoinfo.data_org,2);
         geoinfo.data = geoinfo.data_org-data_mean;
     end
-    
-    
-   
-    
 end
 
