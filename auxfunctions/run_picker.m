@@ -10,20 +10,20 @@ function [geoinfo] = run_picker(opt, tp)
 %% Preprocessing
     disp('Hello!') % Put some initial information here.
     
-    opt = file_interpreter(opt); % Interpret input settings for filenames.
+    opt = input_interpreter(opt);
     
     [geoinfo,tp] = initialize_geoinfo(tp,opt);
     metadata = initialize_metadata(geoinfo, opt);
     
-    [geoinfo, tp] = figure_tune(geoinfo,tp,opt);
-    
-    if ~isfield(opt,'update_seeds')
-        opt.update_seeds = 0;
+    if opt.update_bottom
+        [geoinfo, tp] = figure_tune(geoinfo,tp,opt);
+        opt.update_seeds = 1;
     end
-
-    if opt.update_bottom || opt.update_seeds
+    
+    % Compute seed points for half-automated picking
+    if opt.update_seeds
         [geoinfo, opt] = compute_seeds(geoinfo,tp,opt);
-        
+
         if isfile(opt.filename_geoinfo) && opt.keep_old_picks
             geoinfo = load_old_layers(geoinfo,opt);
         end
