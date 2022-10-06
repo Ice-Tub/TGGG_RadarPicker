@@ -30,7 +30,7 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         data = input.Data;
         twt = input.Time;
         twt_sur = input.Surface;
-        twt_bot = zeros(length(twt_sur));
+        twt_bot = NaN(1, length(twt_sur));
         lat = input.Latitude;
         lon = input.Longitude;
         psX = input.psX;
@@ -44,8 +44,8 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         
         data = input.wfm;
         twt = input.twt';
-        twt_sur = zeros(length(input.lat));
-        twt_bot = zeros(length(input.lat));
+        twt_sur = zeros(1, length(input.lat));
+        twt_bot = NaN(1, length(input.lat));
         lat = input.lat;
         lon = input.lon;
         psX = input.x;
@@ -82,8 +82,8 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         
         data = input.wfm;
         twt = input.twt';
-        twt_sur = NaN(length(input.lat));
-        twt_bot = NaN(length(input.lat));
+        twt_sur = NaN(1, length(input.lat));
+        twt_bot = NaN(1, length(input.lat));
         lat = input.lat;
         lon = input.lon;
         psX = input.x;
@@ -95,19 +95,23 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         
         data = input.data;
         twt = input.travel_time';
-        twt_sur = zeros(length(input.lat));
-        twt_bot = NaN(length(input.lat));
+        twt_sur = zeros(1, length(input.lat));
+        twt_bot = NaN(1, length(input.lat));
         lat = input.lat;
         lon = input.long;
-        psX = input.x_coord;
-        psY = input.y_coord;
+        if input.lat(1) > 0
+            crds = projcrs(3413);
+        else
+            crds = projcrs(3976);            
+        end
+        [psX,psY] = projfwd(crds,lat,lon);
         elevation_sur = input.elev;
-        time_gps = NaN(size(data,2), 1);
-                
+        time_gps = NaN(size(data,2), 1);               
     else
         disp(append("Inputfile type '", inputtype ,"' is unknown."))
-    end
-        
+    end    
+    
+    % Cut radargramm if set by user.
     if nargin == 3
         data = data(rows, :); % Only cut of rows
         twt = twt(rows, 1);
@@ -115,6 +119,11 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         if ischar(clms)
             if strcmp(clms, 'all_clms')
                 clms = 1:size(data,2);
+            end
+        end
+        if ischar(rows)
+            if strcmp(rows, 'all_rows')
+                rows = 1:size(data,1);
             end
         end
         data = data(rows, clms);
@@ -129,17 +138,27 @@ function [geoinfo] = readdata(filename, inputtype, rows, clms)
         time_gps = time_gps(clms);
     end
     
-    x_dist = psX - psX(1); 
-    y_dist = psY - psY(1);
-    dist = sqrt(x_dist.^2 + y_dist.^2);
+    % Indclude additional variables
+    ind = 1:length(twt);
+    ind_sur = mod(find(twt_sur == twt), length(twt))';
+    ind_bot = mod(find(twt_bot == twt), length(twt))';
+    if isempty(ind_bot)
+        ind_bot = NaN(1, length(lat));
+    end 
+    x_dist = psX(2:end) - psX(1:end-1); 
+    y_dist = psY(2:end) - psY(1:end-1);
+    dist = [0, cumsum(sqrt(x_dist.^2 + y_dist.^2))];
     num_trace = length(lat);
     num_layer = [];
     
-    if dist(end) > 1000
-         dist = dist/1000;
-    end
+    %if dist(end) > 1000
+    %     dist = dist/1000;
+    %end
     
     geoinfo.data = data; 
+    geoinfo.ind = ind;
+    geoinfo.ind_sur = ind_sur;
+    geoinfo.ind_bot = ind_bot;
     geoinfo.twt = twt;
     geoinfo.twt_sur = twt_sur;
     geoinfo.twt_bot = twt_bot;

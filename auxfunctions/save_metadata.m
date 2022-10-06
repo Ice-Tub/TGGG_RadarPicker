@@ -23,7 +23,7 @@ metadata.profile_number = repmat(opt.profile_number, 1, size(metadata.IRH_bin,2)
 metadata.trace = 1:size(metadata.IRH_bin,2);
 metadata.picking_date = repmat(opt.picking_date, 1, size(metadata.IRH_bin,2));
 
-save(opt.file_metadata, '-struct', 'metadata');
+save(opt.filename_metadata, '-struct', 'metadata');
 
 end
 
