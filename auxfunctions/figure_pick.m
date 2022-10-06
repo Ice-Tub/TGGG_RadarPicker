@@ -28,14 +28,14 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         data_scaled = geoinfo.data./max(geoinfo.data(:));
         slider_step = [1/1000, 1/100];
     elseif strcmpi(opt.input_type, 'PulsEKKO')
-        data_scaled = geoinfo.data./max(geoinfo.data(:));
+        data_scaled = geoinfo.data;
         slider_step = [1/1000, 1/100];
     end
     
     %% Plot radar data
     [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
     
-    f = figure(); % of flat data with seed points
+    fig2 = figure(); % of flat data with seed points
     
     if strcmpi(opt.input_type, 'awi_flight')
         imagesc(data_scaled)
@@ -51,9 +51,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         caxis([-0.05,0.01])
     end
     
-  
     colorbar
-   
     
     hold on
     plot(sx,sy,'r*', 'MarkerSize', 2) % plot seedpoints
@@ -86,35 +84,35 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     clear data_scaled
     
     % Button settings
-    ui_b = uicontrol('Parent',f,'Style','slider','Units','normalized','Position',bpos,...
-                  'value',cini,'min',cmin,'max',cmax,'SliderStep',slider_step,'callback', @color_callback); % Color slider. Atm it uses fixed max and min values, instead they could be adopted to the file values.
-    bgcolor = f.Color;
-    uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)-0.05,bpos(2),0.05,bpos(4)],...
-                            'String',num2str(cmin),'BackgroundColor',bgcolor);
-    uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)-0.05,bpos(2),0.05,bpos(4)],...
+    ui_b = uicontrol('Parent',fig2,'Style','slider','Units','normalized','Position',bpos,...
+                     'value',cini,'min',cmin,'max',cmax,'SliderStep',slider_step,'callback', @color_callback); % Color slider. Atm it uses fixed max and min values, instead they could be adopted to the file values.
+    bgcolor = fig2.Color;
+    uicontrol('Parent',fig2,'Style','text','Units','normalized','Position',[bpos(1)-0.05,bpos(2),0.05,bpos(4)],...
+              'String',num2str(cmin),'BackgroundColor',bgcolor);
+    uicontrol('Parent',fig2,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)-0.05,bpos(2),0.05,bpos(4)],...
                     'String',num2str(cmax),'BackgroundColor',bgcolor);
-    uicontrol('Parent',f,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)/2-0.15,bpos(2)-0.05,0.3,0.05],...
+    uicontrol('Parent',fig2,'Style','text','Units','normalized','Position',[bpos(1)+bpos(3)/2-0.15,bpos(2)-0.05,0.3,0.05],...
                     'String',append('Color range (value ',char(177),' ',int2str(cr_half),')'),'BackgroundColor',bgcolor);
 
     cl = 1; % Set number of current layers    
-    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13', 'Layer 14', 'Layer 15', 'Layer 16', 'Layer 17', 'Layer 18'},'Units','normalized','Position',cpos,...
+    ui_c = uicontrol('Parent',fig2,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13', 'Layer 14', 'Layer 15', 'Layer 16', 'Layer 17', 'Layer 18'},'Units','normalized','Position',cpos,...
                   'value',cl,'callback', @layer_callback); % Choose layer.
 
     leftright = 1; % Go to left or right. lr = 1 -> right, lr = -1 -> left.
-    ui_d1 = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',d1pos,...
+    ui_d1 = uicontrol('Parent',fig2,'Style','togglebutton', 'String', 'Go left','Units','normalized','Position',d1pos,...
                   'value',leftright,'min',1,'max',-1,'callback', @left_callback); % Select to go left or right.
               
     editing_mode = 0;
-    ui_d2 = uicontrol('Parent',f,'Style','togglebutton', 'String', 'Edit mode','Units','normalized','Position',d2pos,...
+    ui_d2 = uicontrol('Parent',fig2,'Style','togglebutton', 'String', 'Edit mode','Units','normalized','Position',d2pos,...
                   'value',editing_mode,'min',0,'max',1,'callback', @edit_callback); % Select to go left or right.
 
-    ui_e1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Undo pick','Units','normalized','Position',e1pos,...
+    ui_e1 = uicontrol('Parent',fig2,'Style','pushbutton', 'String', 'Undo pick','Units','normalized','Position',e1pos,...
                   'callback', @undo_callback); % Finish selection
 
-    ui_f1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',f1pos,...
+    ui_f1 = uicontrol('Parent',fig2,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',f1pos,...
                   'callback',@save_callback); % Finish selection
     
-    ui_f2 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',f2pos,...
+    ui_f2 = uicontrol('Parent',fig2,'Style','pushbutton', 'String', 'End picking','Units','normalized','Position',f2pos,...
                   'Callback',@end_callback, 'UserData', 1); % Finish selection
 
     %% Plot cross points.
@@ -205,8 +203,6 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
             qualities_old = geoinfo.qualities;
             geoinfo.layers(cl,:) = layer;
             geoinfo.qualities(cl,:) = quality;
-           
-             
         end
         % Plot updated layer
         try
