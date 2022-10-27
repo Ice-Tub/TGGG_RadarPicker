@@ -40,10 +40,11 @@ if opt.exist_bottom
         apos=get(a,'position');
         set(a,'position',[apos(1) apos(2)+0.1 apos(3) apos(4)-0.1]);
         bpos=[apos(1) apos(2)-0.05 apos(3)/3 0.05];
-        cpos=[apos(3)/3+0.15 apos(2)-0.06 0.12 0.05];
-        dpos=[apos(3)/3+0.28 apos(2)-0.06 0.12 0.05];
-        epos=[apos(3)/3+0.41 apos(2)-0.06 0.12 0.05];
-        fpos=[apos(3)/3+0.54 apos(2)-0.06 0.12 0.05];
+        cpos=[apos(3)/3+0.15 apos(2)-0.09 0.12 0.05];
+        dpos=[apos(3)/3+0.28 apos(2)-0.09 0.12 0.05];
+        epos=[apos(3)/3+0.41 apos(2)-0.09 0.12 0.05];
+        f0pos=[apos(3)/3+0.54 apos(2)-0.03 0.12 0.05];
+        f1pos=[apos(3)/3+0.54 apos(2)-0.09 0.12 0.05];
 
         if strcmpi(opt.input_type, 'GPR_HF')
             cr_half = 0.02;
@@ -80,7 +81,10 @@ if opt.exist_bottom
         ui_e = uicontrol('Parent',fig1,'Style','pushbutton', 'String', 'Undo pick','Units','normalized','Position',epos,...
                       'callback', @undo_callback); % Finish selection
 
-        ui_f = uicontrol('Parent',fig1,'Style','pushbutton', 'String', 'Bottom pick done','Units','normalized','Position',fpos,...
+        ui_f0 = uicontrol('Parent',fig1,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',f0pos,...
+                      'Callback',@save_callback, 'UserData', 1); % Finish selection
+                  
+        ui_f = uicontrol('Parent',fig1,'Style','pushbutton', 'String', 'Bottom pick done','Units','normalized','Position',f1pos,...
                       'Callback',@end_callback, 'UserData', 1); % Finish selection
 
         
@@ -107,11 +111,14 @@ if opt.exist_bottom
             if ~get(ui_f, 'UserData')
                 break
             end
-
-            if ~isempty(x)
+            
+            if length(x) == 2 && sum(type) == 2
+                type_in = 10;
+                [x_in, y_in, x_in2, y_in2] = deal(round(x(1)), round(y(1)), round(x(2)), round(y(2)));
+            elseif ~isempty(x)
                 [x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
             else
-                [x_in,y_in,type_in] = deal(x,y,type);
+                type_in = [];
             end
             bottom_pick = geoinfo.ind_bot;
             if type_in == 1 % Left click, create picks. 
@@ -139,6 +146,17 @@ if opt.exist_bottom
                     bottom_pick(del_min:x_in-1) = NaN;
                     quality(del_min:x_in-1) = NaN;
                 end
+            elseif type_in == 10
+                x_range = round(x(1)):round(x(2));
+                rangle_length = length(x_range);
+                bottom_pick(x_range) =  round(linspace(y(1), y(2), rangle_length));
+                if ~editing_mode
+                    if leftright == 1
+                        bottom_pick = propagate_bottom(bottom_pick,geoinfo,tp,opt,x_in2,y_in2,leftright,editing_mode);
+                    else
+                        bottom_pick = propagate_bottom(bottom_pick,geoinfo,tp,opt,x_in,y_in,leftright,editing_mode);
+                    end
+                end
             elseif isempty(type_in)
                 disp('Move and zoom. To continue picking, press enter.')
                 pan on;
@@ -154,8 +172,6 @@ if opt.exist_bottom
             if ~isempty(type_in)
                 bot_old = geoinfo.ind_bot;
                 geoinfo.ind_bot = bottom_pick;
-
-
             end
             % Plot updated layer
             try
@@ -177,7 +193,7 @@ if opt.exist_bottom
         %MinBinBottom = ones(1,geoinfo.num_trace) * tp.MinBinForBottomPick;
         %MaxBinBottom = ones(1,geoinfo.num_trace) * min(tp.MaxBinForBottomPick, length(tp.rows));
         dt=geoinfo.twt(2)-geoinfo.twt(1);
-        %t1=geoinfo.twt(1);
+        t1=geoinfo.twt(1);
 
         while updatePlot 
 
@@ -277,11 +293,18 @@ geoinfo.tp = tp; % Include updated tuning parameters in geoinfo.
 
     function undo_callback(~, ~)
         geoinfo.ind_bot = bot_old;
-        try
-            set(botplot,{'YData'},mat2cell([bot_old; bot_old(cl,:)],[ones(9,1)]));
+        %try
+            %set(botplot,{'YData'},mat2cell([bot_old; bot_old(cl,:)],[ones(9,1)]));
             % ToDo: There is probably some bug caused by this-------------^ 9.
-        end
-    end    
+        %end
+    end
+
+
+    function save_callback(~, ~)
+        save_bottom(geoinfo,tp,opt)
+        disp('Bottom pick saved');
+    end
+
 
     function end_callback(~, ~)
         set(ui_f, 'UserData', 0);

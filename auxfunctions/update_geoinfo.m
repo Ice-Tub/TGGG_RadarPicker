@@ -53,8 +53,8 @@ end
 %% Include missing fields
 if ~isfield(geoinfo,'ind')
     geoinfo.ind = 1:length(geoinfo.twt);
-    geoinfo.ind_sur = mod(find(geoinfo.twt_sur == geoinfo.twt), length(geoinfo.twt))';
-    geoinfo.ind_bot = mod(find(geoinfo.twt_bot == geoinfo.twt), length(geoinfo.twt))';
+    [~, geoinfo.ind_sur] = min(abs(geoinfo.twt_bot - geoinfo.twt));
+    [~, geoinfo.ind_bot] = min(abs(geoinfo.twt_bot - geoinfo.twt));
     if isempty(geoinfo.ind_bot)
         geoinfo.ind_bot = NaN(1, length(geoinfo.lat));
     end 
