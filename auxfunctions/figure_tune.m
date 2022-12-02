@@ -25,7 +25,7 @@ ylim(geoinfo.twt([1 end])./2*300/sqrt(3.17))
 ylabel('Approximate depth (m)')
 axis ij
 yyaxis left
-caxis([0.1 1])
+caxis([0.1 0.9])
 hold on
 
 % Obtain and show surface pick (depending on data type).
