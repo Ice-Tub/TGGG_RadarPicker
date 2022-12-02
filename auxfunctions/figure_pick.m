@@ -50,13 +50,17 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         colormap(opt.cmp)
         caxis([-0.05,0.01])
     end
+    hold on
     
     colorbar
-    
-    hold on
-    plot(sx,sy,'r*', 'MarkerSize', 2) % plot seedpoints
-    %set(gcf,'doublebuffer','on');
     a = gca;
+    
+    % If seedpoints are used, they are plotted in the following
+    if opt.use_seedpoints
+        [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
+        plot(sx,sy,'r*', 'MarkerSize', 2) % plot seedpoints
+        %set(gcf,'doublebuffer','on');
+    end
 
     %% Create color slider and buttons
     % Position

@@ -40,7 +40,8 @@ opt.cross_section = 'EIS_along2'; % Options : List of numbers (e.g.:{'001'; '002
 % The following options can be activated by setting: 1 = yes, 0 = no.
 opt.create_new_geoinfo = 0; % CAUTION: Already picked layer for this echogram will be overwritten, if keep_old_picks = 0.
 opt.update_bottom = 1;      % Update bottom, when old geoinfo is loaded.
-opt.update_seeds = 1;      % Update bottom, when old geoinfo is loaded.
+opt.use_seedpoints = 0;
+opt.update_seeds = 1;       % Update bottom, when old geoinfo is loaded.
 opt.manual_bottom_pick = 1; % Pick bottom manually, needed for data with intereupted or weak bottom reflector.
 opt.keep_old_picks = 1;     % Keep old picks, when old geoinfo is loaded.
 opt.load_crossover = 1;     % Activate loading cross-over points.

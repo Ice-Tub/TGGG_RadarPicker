@@ -21,7 +21,8 @@ function [geoinfo] = run_picker(opt, tp)
     end
     
     % Compute seed points for half-automated picking
-    if opt.update_seeds
+    
+    if opt.use_seedpoints && opt.update_seeds
         [geoinfo, opt] = compute_seeds(geoinfo,tp,opt);
 
         if isfile(opt.filename_geoinfo) && opt.keep_old_picks

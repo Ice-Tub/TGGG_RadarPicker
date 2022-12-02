@@ -12,17 +12,19 @@ function [layer,quality] = propagate_layer(layer,quality,geoinfo,tp,opt,x_in,y_i
             %disp('Pick.')
             y_trace = y_in;
             quality(x_trace) = 1;
-        elseif any(geoinfo.peakim(current_window,x_trace)) % Check if any seed is in window.
-            [lind, ~, value] = find(geoinfo.peakim(current_window,x_trace));
-            if length(lind)==1
-                %disp('One seed - yay')
-               quality(x_trace)=2;
-            else
-                %disp('###closest seed')
-               wdist = abs(lind - lmid);
-               lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value.
-               y_trace = current_window(lind);
-               quality(x_trace)=3;
+        elseif opt.use_seedpoints
+            if any(geoinfo.peakim(current_window,x_trace)) % Check if any seed is in window.
+                [lind, ~, value] = find(geoinfo.peakim(current_window,x_trace));
+                if length(lind)==1
+                    %disp('One seed - yay')
+                   quality(x_trace)=2;
+                else
+                    %disp('###closest seed')
+                   wdist = abs(lind - lmid);
+                   lind = lind(value == max(value(wdist == min(wdist)))); % Find closest seed with biggest value.
+                   y_trace = current_window(lind);
+                   quality(x_trace)=3;
+                end
             end
         else
             if strcmpi(opt.input_type, 'MCoRDS')
