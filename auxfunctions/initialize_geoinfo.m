@@ -49,9 +49,9 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
     
     current_version = 1.1;
     if ~isfield(geoinfo,'version')
-        geoinfo = update_geoinfo(geoinfo, current_version);
+        geoinfo = update_geoinfo(geoinfo, current_version, tp);
     elseif geoinfo.version < current_version
-        geoinfo = update_geoinfo(geoinfo, current_version);
+        geoinfo = update_geoinfo(geoinfo, current_version, tp);
     end
     
     % ToDo: Reorganize very specific options such as delete_stripes
