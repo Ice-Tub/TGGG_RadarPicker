@@ -3,7 +3,7 @@ function [geoinfo] = pick_bottom(geoinfo, tp, opt, MinBottomPick, MaxBottomPick)
 %   
 
 if opt.exist_bottom
-    geoinfo.data
+    %geoinfo.data
 
     if strcmpi(opt.input_type, 'MCoRDS')
         data_scaled = mag2db(geoinfo.data);

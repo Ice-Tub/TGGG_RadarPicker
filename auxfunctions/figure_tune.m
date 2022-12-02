@@ -243,9 +243,7 @@ if opt.exist_bottom
             minplot = plot(tp.clms,MinBinBottom, 'k--');
             hold on
             botplot = plot(tp.clms,geoinfo.ind_bot,'-','Linewidth',2, 'Color', [0.8500    0.3250    0.0980]);
-            hold on
             maxplot = plot(tp.clms,MaxBinBottom, 'k--');
-            hold on
 
             % define minBinForBottom manually and number of bottom peaks
             % manually

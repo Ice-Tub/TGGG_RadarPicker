@@ -11,8 +11,7 @@ function [opt] = input_interpreter(opt)
 
 
 opt = file_interpreter(opt); % Interpret input settings for filenames.
-    
-opt.manual_bottom_pick
+
 
 % Ensure that option to turn off bottom pick exists.
 if ~isfield(opt,'exist_bottom')
