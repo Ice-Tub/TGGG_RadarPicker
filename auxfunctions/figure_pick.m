@@ -74,12 +74,8 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     f1pos=[apos(3)/3+0.54 apos(2)-0.03 0.12 0.05];
     f2pos=[apos(3)/3+0.54 apos(2)-0.09 0.12 0.05];
 
-    if strcmpi(opt.input_type, 'GPR_HF')
-        cr_half = 0.02;
-    else
-        cr_half = opt.len_color_range/2;
-    end
-    
+    cr_half = opt.len_color_range/2;
+        
     cmin = round(min(data_scaled,[],'all')+cr_half,2); % Added 2 for GPR here.
     cmax = round(max(data_scaled,[],'all')-cr_half,2);
     cini = (cmin+cmax)/2;
