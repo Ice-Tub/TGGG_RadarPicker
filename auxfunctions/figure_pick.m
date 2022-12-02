@@ -6,52 +6,31 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     
     if strcmpi(opt.input_type, 'MCoRDS')
         data_scaled = mag2db(geoinfo.data); % Rescale MCoRDS data to db.
-        slider_step = [1/100, 1/10];
-    elseif strcmpi(opt.input_type, 'GPR_LF')
-        
-         % if filter_frequencies activated, filter frequencies over 10 MHz
-        if opt.filter_frequencies
-            dt = geoinfo.twt(2)-geoinfo.twt(1);
-            geoinfo.data_filtered = lowpass(geoinfo.data, 1*10^7*dt);
-            data_scaled = geoinfo.data_filtered;
-            slider_step = [1/1000, 1/100];
-        else
-            data_scaled = geoinfo.data;
-            slider_step = [1/1000, 1/100];
-        end
-        
-        
-    elseif strcmpi(opt.input_type, 'GPR_HF')
+    else
         data_scaled = geoinfo.data;
-        slider_step = [1/1000, 1/100];
-    elseif strcmpi(opt.input_type, 'awi_flight')
-        data_scaled = geoinfo.data./max(geoinfo.data(:));
-        slider_step = [1/1000, 1/100];
-    elseif strcmpi(opt.input_type, 'PulsEKKO')
-        data_scaled = geoinfo.data;
-        slider_step = [1/1000, 1/100];
+    end        
+        slider_step = [1/100, 1/100];
+        
+     % if filter_frequencies activated, filter frequencies over 10 MHz
+    if opt.filter_frequencies
+        dt = geoinfo.twt(2)-geoinfo.twt(1);
+        geoinfo.data_filtered = lowpass(geoinfo.data, 1*10^7*dt);
+        data_scaled = geoinfo.data_filtered;
     end
+    
+    data_scaled = data_scaled - min(data_scaled,[],'all'); % Shift data too positvie values only.    
+    data_scaled = data_scaled/max(data_scaled,[],'all'); % Normalize to range [0 1].
     
     %% Plot radar data
     [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
     
     fig2 = figure(); % of flat data with seed points
     
-    if strcmpi(opt.input_type, 'awi_flight')
-        imagesc(data_scaled)
-        colormap(opt.cmp)
-        caxis([-0.04 0.06])
-%     elseif strcmpi(opt.input_type, 'PulsEKKO')
-%         imagesc(data_scaled)
-%         colormap(opt.cmp)
-%         caxis([-0.1, 2])
-    else
-        imagesc(data_scaled);
-        colormap(opt.cmp)
-        caxis([-0.05,0.01])
-    end
+    imagesc(data_scaled);
     hold on
     
+    colormap(opt.cmp)
+    caxis([0.1,0.9])
     colorbar
     a = gca;
     
