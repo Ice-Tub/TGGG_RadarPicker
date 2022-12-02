@@ -54,6 +54,15 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
         geoinfo = update_geoinfo(geoinfo, current_version, tp);
     end
     
+    if strcmp(opt.input_type, 'PulsEKKO')
+        if geoinfo.lat(1) > 0
+            crds = projcrs(3413);
+        else
+            crds = projcrs(3976);            
+        end
+        [geoinfo.psX,geoinfo.psY] = projfwd(crds,geoinfo.lat,geoinfo.lon);
+    end
+    
     % ToDo: Reorganize very specific options such as delete_stripes
     if opt.delete_stripes
         geoinfo.data_org = geoinfo.data;
