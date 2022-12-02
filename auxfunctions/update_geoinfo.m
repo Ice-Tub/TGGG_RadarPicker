@@ -1,4 +1,4 @@
-function geoinfo = update_geoinfo(geoinfo, current_version)
+function geoinfo = update_geoinfo(geoinfo, current_version, tp)
 %%
 % ToDo: Include option 'append'
 %% Rename fields with depracted names.
@@ -50,6 +50,7 @@ if isfield(geoinfo,'time_pick_abs')
     geoinfo = rmfield(geoinfo,'time_pick_abs');
 end
 
+
 %% Include missing fields
 if ~isfield(geoinfo,'ind')
     geoinfo.ind = 1:length(geoinfo.twt);
@@ -58,6 +59,10 @@ if ~isfield(geoinfo,'ind')
     if isempty(geoinfo.ind_bot)
         geoinfo.ind_bot = NaN(1, length(geoinfo.lat));
     end 
+end
+
+if ~isfield(geoinfo,'tp')
+    geoinfo.tp = tp;
 end
 
 geoinfo.version = current_version;
