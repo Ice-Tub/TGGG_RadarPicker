@@ -28,6 +28,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     
     imagesc(data_scaled);
     hold on
+    botplot = plot(tp.clms,geoinfo.ind_bot,'-','Linewidth',2, 'Color', [0.8500    0.3250    0.0980]);
     
     colormap(opt.cmp)
     caxis([0.1,0.9])

@@ -24,10 +24,12 @@ if opt.exist_bottom
 
     BottomInds = floor(movmean(BottomInds,tp.smooth_bot));
     BottomInds = BottomInds + MinBottomPick;
-
+        
+    geoinfo.ind_bot = BottomInds;
     geoinfo.twt_bot = ind2twt(geoinfo,BottomInds);
 
 else % No bottom reflector exists in data.
+    geoinfo.ind_bot = NaN(1,geoinfo.num_trace);
     geoinfo.twt_bot = NaN(1,geoinfo.num_trace);
 end
 
