@@ -31,7 +31,9 @@ end
 % Turn relative paths into absolut paths.
 % Get full input filename (Not needed if geoinfo file already exists)
 input_path = dir(fullfile(opt.input_folder, opt.input_file)); % Obtain abolute path and file name, independent of 'opt.input_folder' being an absolute or relative path.
-opt.filename_input_data = fullfile(input_path.folder, input_path.name); % Get the full input file name.
+if ~isempty(input_path)  % Only need to process input file if it is not empty, which might be sufficient when working with existing LayerData files.
+    opt.filename_input_data = fullfile(input_path.folder, input_path.name); % Get the full input file name.
+end
 
 % Get full output filename
 output_path = dir(opt.output_folder); % Obtain absolute output path.
