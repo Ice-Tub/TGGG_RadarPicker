@@ -22,7 +22,6 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     data_scaled = data_scaled/max(data_scaled,[],'all'); % Normalize to range [0 1].
     
     %% Plot radar data
-    [sy,sx] = find(geoinfo.peakim); % Extract seed point locations
     
     fig2 = figure(); % of flat data with seed points
     
