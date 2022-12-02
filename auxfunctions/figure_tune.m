@@ -206,6 +206,8 @@ if opt.exist_bottom
                     MaxBinBottom = interp1q(x,y_ind,tp.clms');
                     MaxBinBottom = round(MaxBinBottom');
                 end
+            else
+                MaxBinBottom = ones(size(geoinfo.ind_bot)) * tp.MaxBinForBottomPick;
             end
 
             if manual_MinBFBP
@@ -222,6 +224,8 @@ if opt.exist_bottom
                     MinBinBottom = interp1q(x,y_ind,tp.clms');
                     MinBinBottom = round(MinBinBottom');
                 end
+            else
+                MinBinBottom = ones(size(geoinfo.ind_bot)) * tp.MinBinForBottomPick;
             end
 
             if opt.update_bottom
