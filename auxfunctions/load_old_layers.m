@@ -3,6 +3,8 @@ function [geoinfo] = load_old_layers(geoinfo,opt)
 %   Detailed explanation goes here
     geoinfo_old = load(opt.filename_geoinfo);
     geoinfo.num_layer = geoinfo_old.num_layer;
+    geoinfo.ind_bot = geoinfo_old.ind_bot;
+    geoinfo.twt_bot = geoinfo_old.twt_bot;
     clms_old = geoinfo_old.tp.clms;
     clms_new = geoinfo.tp.clms;
     clms_old_min = max(1,clms_new(1)-clms_old(1)+1);
