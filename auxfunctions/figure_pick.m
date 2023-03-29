@@ -50,6 +50,7 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
     d1pos=[apos(3)/3+0.28 apos(2)-0.03 0.12 0.05];
     d2pos=[apos(3)/3+0.28 apos(2)-0.09 0.12 0.05];
     e1pos=[apos(3)/3+0.41 apos(2)-0.03 0.12 0.05];
+    e2pos=[apos(3)/3+0.41 apos(2)-0.09 0.12 0.05];
     f1pos=[apos(3)/3+0.54 apos(2)-0.03 0.12 0.05];
     f2pos=[apos(3)/3+0.54 apos(2)-0.09 0.12 0.05];
 
@@ -87,6 +88,10 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
 
     ui_e1 = uicontrol('Parent',fig2,'Style','pushbutton', 'String', 'Undo pick','Units','normalized','Position',e1pos,...
                   'callback', @undo_callback); % Finish selection
+
+    hide_picks = 0;
+    ui_e2 = uicontrol('Parent',fig2,'Style','togglebutton', 'String', 'Hide picks','Units','normalized','Position',e2pos,...
+                  'value',hide_picks,'min',0,'max',1,'callback', @hide_callback); % Select to hide peaks or show.
 
     ui_f1 = uicontrol('Parent',fig2,'Style','pushbutton', 'String', 'Save picks','Units','normalized','Position',f1pos,...
                   'callback',@save_callback); % Finish selection
@@ -190,7 +195,9 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         try
             delete(layerplot);
         end
-        layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'m-x');
+        if ~hide_picks
+           layerplot = plot(1:length(geoinfo.layers),geoinfo.layers,'k-x',1:length(geoinfo.layers(cl,:)),geoinfo.layers(cl,:),'m-x');
+        end
     end
     
     %% Callback functions
@@ -229,6 +236,9 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
         end
     end    
 
+    function hide_callback(~, ~)
+        hide_picks = get(gcbo,'value');
+    end
 
     function save_callback(~, ~)
         save_picks(geoinfo,metadata,tp,opt)
