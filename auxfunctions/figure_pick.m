@@ -133,7 +133,10 @@ function [geoinfo, metadata] = figure_pick(geoinfo, metadata, tp, opt)
             break
         end
 
-        if ~isempty(x)
+        if ~isempty(type)
+            %disp(strcat('x=', string(x)))
+            %disp(strcat('y=', string(y)))
+            %disp(strcat('type=', string(type)))
             [x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
         else
             [x_in,y_in,type_in] = deal(x,y,type);
