@@ -109,9 +109,12 @@ if opt.exist_bottom
             
             if length(x) == 2 && sum(type) == 2
                 type_in = 10;
-                [x_in, y_in, x_in2, y_in2] = deal(round(x(1)), round(y(1)), round(x(2)), round(y(2)));
+                [x_in1, y_in1, x_in2, y_in2] = deal(round(x(1)), round(y(1)), round(x(2)), round(y(2)));
+                x_in1 = x_in1 - tp.clms(1) + 1;
+                x_in2 = x_in2 - tp.clms(1) + 1;
             elseif ~isempty(x)
                 [x_in,y_in,type_in] = deal(round(x(end)),round(y(end)),type(end));
+                x_in = x_in - tp.clms(1) + 1;
             else
                 type_in = [];
             end
@@ -142,14 +145,14 @@ if opt.exist_bottom
                     quality(del_min:x_in-1) = NaN;
                 end
             elseif type_in == 10
-                x_range = round(x(1)):round(x(2));
+                x_range = round(x_in1):round(x_in2);
                 rangle_length = length(x_range);
-                bottom_pick(x_range) =  round(linspace(y(1), y(2), rangle_length));
+                bottom_pick(x_range) =  round(linspace(y_in1, y_in2, rangle_length));
                 if ~editing_mode
                     if leftright == 1
                         bottom_pick = propagate_bottom(bottom_pick,geoinfo,tp,opt,x_in2,y_in2,leftright,editing_mode);
                     else
-                        bottom_pick = propagate_bottom(bottom_pick,geoinfo,tp,opt,x_in,y_in,leftright,editing_mode);
+                        bottom_pick = propagate_bottom(bottom_pick,geoinfo,tp,opt,x_in1,y_in1,leftright,editing_mode);
                     end
                 end
             elseif isempty(type_in)
