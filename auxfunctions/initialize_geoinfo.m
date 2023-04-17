@@ -47,20 +47,12 @@ function [geoinfo,tp] = initialize_geoinfo(tp,opt)
     % 1: Initial picker version used for Inka's paper
     % 1.1: Include manual bed picker and ind variables
     
-    current_version = 1.1;
-    if ~isfield(geoinfo,'version')
-        geoinfo = update_geoinfo(geoinfo, current_version, tp);
-    elseif geoinfo.version < current_version
-        geoinfo = update_geoinfo(geoinfo, current_version, tp);
+    if ~isfield(geoinfo,'version') || geoinfo.version < tp.current_version
+        geoinfo = update_geoinfo(geoinfo, tp);
     end
     
     if strcmp(opt.input_type, 'PulsEKKO')
-        if geoinfo.lat(1) > 0
-            crds = projcrs(3413);
-        else
-            crds = projcrs(3976);            
-        end
-        [geoinfo.psX,geoinfo.psY] = projfwd(crds,geoinfo.lat,geoinfo.lon);
+        [geoinfo.psX,geoinfo.psY] = ll2ps(geoinfo.lat,geoinfo.lon); %convert to polar stereographic
     end
     
     % ToDo: Reorganize very specific options such as delete_stripes

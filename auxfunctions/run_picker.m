@@ -10,13 +10,15 @@ function [geoinfo] = run_picker(opt, tp)
 %% Preprocessing
     disp('Hello!') % Put some initial information here.
     
+    tp.current_version = 1.1;
+
     opt = input_interpreter(opt);
     
     [geoinfo,tp] = initialize_geoinfo(tp,opt);
     metadata = initialize_metadata(geoinfo, opt);
     
     if isfile(opt.filename_geoinfo) && opt.keep_old_picks
-        geoinfo = load_old_layers(geoinfo,opt);
+        geoinfo = load_old_layers(geoinfo,tp,opt);
     end
     
     if opt.update_bottom

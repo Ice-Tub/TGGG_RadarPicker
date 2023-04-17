@@ -1,4 +1,4 @@
-function geoinfo = update_geoinfo(geoinfo, current_version, tp)
+function geoinfo = update_geoinfo(geoinfo, tp)
 %%
 % ToDo: Include option 'append'
 %% Rename fields with depracted names.
@@ -65,5 +65,5 @@ if ~isfield(geoinfo,'tp')
     geoinfo.tp = tp;
 end
 
-geoinfo.version = current_version;
+geoinfo.version = tp.current_version;
 end

@@ -1,18 +1,25 @@
-function [geoinfo] = load_old_layers(geoinfo,opt)
+function [geoinfo] = load_old_layers(geoinfo,tp,opt)
 %LOAD_OLD_LAYERS Summary of this function goes here
 %   Detailed explanation goes here
     geoinfo_old = load(opt.filename_geoinfo);
-    geoinfo.num_layer = geoinfo_old.num_layer;
-    if isfield(geoinfo_old, 'ind_bot')
-        geoinfo.ind_bot = geoinfo_old.ind_bot;
-        geoinfo.twt_bot = geoinfo_old.twt_bot;
+
+    if ~isfield(geoinfo_old,'version') || geoinfo_old.version < tp.current_version
+        geoinfo_old = update_geoinfo(geoinfo_old, tp);
     end
+
+    geoinfo.num_layer = geoinfo_old.num_layer;
+
     clms_old = geoinfo_old.tp.clms;
     clms_new = geoinfo.tp.clms;
     clms_old_min = max(1,clms_new(1)-clms_old(1)+1);
     clms_old_max = min(length(clms_old),clms_new(end)-clms_old(1)+1);
     clms_new_min = max(1,clms_old(1)-clms_new(1)+1);
     clms_new_max = min(length(clms_new),clms_old(end)-clms_new(1)+1);
+
+    if isfield(geoinfo_old, 'ind_bot')
+        geoinfo.ind_bot(clms_new_min:clms_new_max) = geoinfo_old.ind_bot(clms_old_min:clms_old_max);
+        geoinfo.twt_bot(clms_new_min:clms_new_max) = geoinfo_old.twt_bot(clms_old_min:clms_old_max);
+    end
 
     geoinfo.layers = NaN(opt.nol,geoinfo.num_trace);
     %geoinfo.layers_relto_surface = NaN(opt.nol,geoinfo.num_trace);

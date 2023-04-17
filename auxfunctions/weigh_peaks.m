@@ -20,7 +20,7 @@ dist_select_inverse = 1 - normalized_distance(lind);
 normalized_prominence = transpose(p/max(p));
 
 % calculate the weights/probabilities
-probabilities = weight_factor*dist_select_inverse + normalized_prominence; 
+probabilities = normalized_prominence + weight_factor*dist_select_inverse; 
 
 
 end

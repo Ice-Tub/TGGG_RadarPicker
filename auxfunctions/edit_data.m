@@ -30,9 +30,9 @@ elseif isequal(m_option, 'swap')
         edit_note = append('Swapping line ', num2str(mtl), ' and ', num2str(mfl), ' of ', mt_file,'.');
         disp(edit_note)
         [mt_geoinfo.layers(mtl, :), mt_geoinfo.layers(mfl, :)] = deal(mf_geoinfo.layers(mfl, :), mf_geoinfo.layers(mtl, :));
-        [mt_geoinfo.layers_relto_surface(mtl, :), mt_geoinfo.layers_relto_surface(mfl, :)] = deal(mf_geoinfo.layers_relto_surface(mfl, :), mf_geoinfo.layers_relto_surface(mtl, :));
-        [mt_geoinfo.layers_topo(mtl, :), mt_geoinfo.layers_topo(mfl, :)] = deal(mf_geoinfo.layers_topo(mfl, :), mf_geoinfo.layers_topo(mtl, :));
-        [mt_geoinfo.layers_topo_depth(mtl, :), mt_geoinfo.layers_topo_depth(mfl, :)] = deal(mf_geoinfo.layers_topo_depth(mfl, :), mf_geoinfo.layers_topo_depth(mtl, :));
+        [mt_geoinfo.layers_relto_surf(mtl, :), mt_geoinfo.layers_relto_surf(mfl, :)] = deal(mf_geoinfo.layers_relto_surf(mfl, :), mf_geoinfo.layers_relto_surf(mtl, :));
+        [mt_geoinfo.layers_relto_surf_twt(mtl, :), mt_geoinfo.layers_relto_surf_twt(mfl, :)] = deal(mf_geoinfo.layers_relto_surf_twt(mfl, :), mf_geoinfo.layers_relto_surf_twt(mtl, :));
+        %[mt_geoinfo.layers_topo_depth(mtl, :), mt_geoinfo.layers_topo_depth(mfl, :)] = deal(mf_geoinfo.layers_topo_depth(mfl, :), mf_geoinfo.layers_topo_depth(mtl, :));
         [mt_geoinfo.qualities(mtl, :), mt_geoinfo.qualities(mfl, :)] = deal(mf_geoinfo.qualities(mfl, :), mf_geoinfo.qualities(mtl, :));
     else
         disp("The 'swap'-option only works, if move_from_file and move_to_file are equal.")
@@ -116,7 +116,7 @@ try
 
     cl = 1; % Set number of current layer    
 
-    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13', 'Layer 14', 'Layer 15'},'Units','normalized','Position',bpos,...
+    ui_c = uicontrol('Parent',f,'Style','popupmenu', 'String', {'Layer 1','Layer 2','Layer 3','Layer 4','Layer 5','Layer 6','Layer 7','Layer 8','Layer 9','Layer 10', 'Layer 11', 'Layer 12', 'Layer 13', 'Layer 14', 'Layer 15', 'Layer 16'},'Units','normalized','Position',bpos,...
                       'value',cl,'callback', @layer_callback); % Choose layer.
 
     ui_f1 = uicontrol('Parent',f,'Style','pushbutton', 'String', 'Save changes','Units','normalized','Position',cpos,...
